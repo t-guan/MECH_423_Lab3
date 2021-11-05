@@ -12,11 +12,10 @@ void processPacket(void);
 unsigned char dequeueBuffer(void);
 void enqueueBuffer(unsigned char val);
 unsigned int combineBytes(unsigned char lower, unsigned char upper);
-void processSpeed(unsigned int data);
+void processPWM(unsigned int data);
 
 // other functions
 void delayNOP(unsigned int cycles);
-void advanceStep(void);
 
 // variables
 unsigned char buffer[50];
@@ -36,14 +35,6 @@ unsigned int u;
 unsigned int maxTimerVal;
 unsigned int dutyTimerVal;
 unsigned int max;
-unsigned int temp;
-unsigned int prevclk0;//Store Previous Clock Value
-unsigned int currclk0;//Store Current Clock Value
-unsigned int enccounts0; //Store the encoder count between clock values
-unsigned int prevclk1;//Store previous clock value
-unsigned int currclk1;//Store current clock value
-unsigned int enccounts1;//Store the encoder count between clock values
-
 double duty;
 double newTimerVal;
 int i;
@@ -58,7 +49,12 @@ int main(void)
     configureMiscPins();
     enableInterrupts();
 
-    while(1) {}
+    while(1) {
+        // FOR UART DEBUG
+        UCA1TXBUF = 43; // periodically transmit 'a' to serial port
+        while ((UCA1IFG & UCTXIFG) == 0);
+        delayNOP(2000);
+    }
 }
 
 void configureCS(void)
@@ -70,7 +66,7 @@ void configureCS(void)
     CSCTL1 |= DCOFSEL0 + DCOFSEL1; // DCO setting -> configured to 8 MHz
     CSCTL2 = SELM0 + SELM1 + SELA0 + SELA1 + SELS0 + SELS1; // MCLK = ACLK = SMCLK = DCO
     //CSCTL2 = SELS_3; // SMCLK source is set to 011b = DCOCLK
-    //CSCTL3 = DIVS_5; // SMCLK source divider is set to 101b -> divider of 32. DEFAULT IS DIVIDE BY 8
+    //CSCTL3 = DIVS_5; // SMCLK source divider is set to 101b -> divider of 32
 }
 
 void configureUART(void)
@@ -93,49 +89,32 @@ void configureUART(void)
 void configureTimer(void)
 {
     // set P2.1 to TB2.1
+    //P2OUT = 0;
     P2DIR  |= BIT1;
     P2SEL0 |= BIT1;
     P2SEL1 &= ~(BIT1);
 
-    // set P1.4, P1.5 to TB0.1, TB0.2
-    P1DIR  |= BIT4 + BIT5;
-    P1SEL0 |= BIT4 + BIT5;
-    P1SEL1 &= ~(BIT4 + BIT5);
-
-    // set P3.4, P3.5 to TB1.1, TB1.2
-    P3DIR  |= BIT4 + BIT5;
-    P3SEL0 |= BIT4 + BIT5;
-    P3SEL1 &= ~(BIT4 + BIT5);
-
-    TB2CCR0 = 100000; // Timer overflow value
-    TB2CCR1 = 75000;
+    TB2CCR0 = 2000; // Timer overflow value
+    TB2CCR1 = 250;
     TB2CCTL1 = OUTMOD_3;
     TB2CTL = TBSSEL_2 + MC_1; // SMCLK, UP mode
-
-    // Configure timers that are internally connected to stepper input pins
-    TB0CCR0 = 2000;
-    TB0CCR1 = 1500;
-    TB0CCR2 = 1500;
-    TB0CCTL1 = OUTMOD_3;
-    TB0CCTL2 = OUTMOD_3;
-    TB0CTL = TBSSEL_2 + MC_1;
-
-    TB1CCR0 = 2000;
-    TB1CCR1 = 1500;
-    TB1CCR2 = 1500;
-    TB1CCTL1 = OUTMOD_3;
-    TB1CCTL2 = OUTMOD_3;
-    TB1CTL = TBSSEL_2 + MC_1;
 }
 
 void configureMiscPins(void)
 {
-    // reserved
+    // set P3.6, P3.7 to outputs that we toggle for AIN1, AIN2
+    P3OUT = 0;
+    P3DIR |= (BIT6 + BIT7);
+    P3SEL0 &= ~(BIT6 + BIT7);
+    P3SEL1 &= ~(BIT6 + BIT7);
+
+    // force one direction at start
+    P3OUT |= BIT6;
+    P3OUT &= ~(BIT7);
 }
 
 void enableInterrupts(void)
 {
-    TB2CCTL0 |= CCIE;
     UCA1IE |= UCRXIE; // enable Receive Interrupt, User Guide page 502
     _EINT(); // global interrupt enable
 }
@@ -188,31 +167,22 @@ void processPacket(void)
 
     fullData = combineBytes(LowerDataByte, UpperDataByte);
 
+
     if (CmdByte == 0)
     {
-        processSpeed(fullData);
+        processPWM(fullData); // changes PWM
     }
     if (CmdByte == 1)
     {
-        TB2CTL |= MC_1;
-        forwardStepDir = 1;
+        // change dir to ccw
+        P3OUT |= BIT7;
+        P3OUT &= ~(BIT6);
     }
     if (CmdByte == 2)
     {
-        TB2CTL |= MC_1;
-        forwardStepDir = 0;
-    }
-    if (CmdByte == 3)
-    {
-        TB2CTL &= ~(MC_1);
-        forwardStepDir = 1;
-        advanceStep();
-    }
-    if (CmdByte == 4)
-    {
-        TB2CTL &= ~(MC_1);
-        forwardStepDir = 0;
-        advanceStep();
+        // change dir to cw
+        P3OUT |= BIT6;
+        P3OUT &= ~(BIT7);
     }
 }
 
@@ -225,17 +195,16 @@ unsigned int combineBytes(unsigned char lower, unsigned char upper)
     return res;
 }
 
-void processSpeed(unsigned int data)
+void processPWM(unsigned int data)
 {
-    if (data == 0)
-    {
-        TB2CTL &= ~(MC_1);
-    }
-    else
-    {
-        temp = 1000000 / data;
-        TB2CCR0 = temp;
-    }
+    max = 65535;
+    maxTimerVal = TB2CCR0;
+
+    duty = (double)data / (double)max;
+    newTimerVal = (double)maxTimerVal * duty;
+
+    // change timer value to duty cycle
+    TB2CCR1 = (unsigned int)newTimerVal;
 }
 
 void delayNOP(unsigned int cycles)
@@ -244,11 +213,6 @@ void delayNOP(unsigned int cycles)
     {
         _NOP();
     }
-}
-
-void encoderCalc(void)
-{
-
 }
 
 #pragma vector = USCI_A1_VECTOR
@@ -286,15 +250,17 @@ __interrupt void USCI_A1_ISR(void)
     }
 }
 
-// TB2.0 ISR - CCIFG automatically reset when request is serviced
-#pragma vector = TIMER2_B0_VECTOR
-__interrupt void Timer_B2_0 (void)
-{
-    encoder0Calc();
-    encoder1Clac();
-}
-//TB
+// CONNECTIONS
+// -----------
+// see page 18 on Lab 3 manual, requires external Polulu motor driver
 
+// PSEUDOCODE
+// ----------
+//  set up timer connected to P2.1 in continuous mode with 50% pwm to start
+//  if (packet received from C# program)
+//      extract pwm and dir information from it
+//      change dir (turn on P3.7, turn off P3.6)
+//      change pwm (on timer connected to P2.1)
 
 // PACKET STRUCTURE
 // ----------------
@@ -306,20 +272,17 @@ __interrupt void Timer_B2_0 (void)
 // ------------
 // StartByte -> always 255
 // CmdByte
-//      0 = changeSpeed
+//      0 = changePWM
 //      1 = dir clockwise
 //      2 = dir counterclockwise
-// DataByte1 -> upper 8 bits of 16bit speed value
-// DataByte2 -> lower 8 bits of 16bit speed value
+// DataByte1 -> upper 8 bits of 16bit PWM value
+// DataByte2 -> lower 8 bits of 16bit PWM value
 // EscByte
-//      0 = no DataByte change
+//      0 = no PWM change
 //      1 = DataByte1   -> 255
 //      2 = DataByte2   -> 255
 //      3 = DataByte1,2 -> 255
-
-// Slider Packet
-//      direction packet: {255, 1 or 2, 0, 0, 0}
-//      speed packet:     {255, 0, UpperSpeed, LowerSpeed, SpeedEsc}
-
-// Single Step Packet
-//      step packet:      {255, 3 or 4, 0, 0, 0}
+//
+// NOTE ABOUT PWM DataBytes:
+// 0% PWM at {DataByte1, DataByte2} = 0
+// 100% PWM at {DataByte1, DataByte2} = 0xFFFF = 65535
