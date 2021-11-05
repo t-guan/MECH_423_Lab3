@@ -1,0 +1,10 @@
+C:\Users\Thomas\MECH423Lab3\MECH-423-Lab3-\Ex4\VS\Mech423Lab3Ex4\bin\Debug\Mech423Lab3Ex4.exe.config
+C:\Users\Thomas\MECH423Lab3\MECH-423-Lab3-\Ex4\VS\Mech423Lab3Ex4\bin\Debug\Mech423Lab3Ex4.exe
+C:\Users\Thomas\MECH423Lab3\MECH-423-Lab3-\Ex4\VS\Mech423Lab3Ex4\bin\Debug\Mech423Lab3Ex4.pdb
+C:\Users\Thomas\MECH423Lab3\MECH-423-Lab3-\Ex4\VS\Mech423Lab3Ex4\obj\Debug\Mech423Lab3Ex4.csproj.AssemblyReference.cache
+C:\Users\Thomas\MECH423Lab3\MECH-423-Lab3-\Ex4\VS\Mech423Lab3Ex4\obj\Debug\Mech423Lab3Ex4.Form1.resources
+C:\Users\Thomas\MECH423Lab3\MECH-423-Lab3-\Ex4\VS\Mech423Lab3Ex4\obj\Debug\Mech423Lab3Ex4.Properties.Resources.resources
+C:\Users\Thomas\MECH423Lab3\MECH-423-Lab3-\Ex4\VS\Mech423Lab3Ex4\obj\Debug\Mech423Lab3Ex4.csproj.GenerateResource.cache
+C:\Users\Thomas\MECH423Lab3\MECH-423-Lab3-\Ex4\VS\Mech423Lab3Ex4\obj\Debug\Mech423Lab3Ex4.csproj.CoreCompileInputs.cache
+C:\Users\Thomas\MECH423Lab3\MECH-423-Lab3-\Ex4\VS\Mech423Lab3Ex4\obj\Debug\Mech423Lab3Ex4.exe
+C:\Users\Thomas\MECH423Lab3\MECH-423-Lab3-\Ex4\VS\Mech423Lab3Ex4\obj\Debug\Mech423Lab3Ex4.pdb
