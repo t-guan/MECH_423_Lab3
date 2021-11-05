@@ -14,11 +14,14 @@ namespace Mech423Lab3Ex4
 {
     public partial class Form1 : Form
     {
-        ConcurrentQueue<Int32> Posvalues = new ConcurrentQueue<Int32>();
-        ConcurrentQueue<Int32> Velvalues = new ConcurrentQueue<Int32>();
+        ConcurrentQueue<double> Posvalues = new ConcurrentQueue<double>();
+        ConcurrentQueue<double> Velvalues = new ConcurrentQueue<double>();
+        ConcurrentQueue<Int32> databyte = new ConcurrentQueue<Int32>();
         int x = 0;
-        int pval = 0;
-        int vval = 0;
+        double pval = 0;
+        double vval = 0;
+        int freq = 1000;
+        double circ = 0.523;
         Series posdata = new Series();
         Series veldata = new Series();
         Random rnd = new Random();
@@ -34,16 +37,16 @@ namespace Mech423Lab3Ex4
             posdata.ChartType = SeriesChartType.Line;
             posdata.BorderWidth = 2;
             posdata.Color = Color.Purple;
-            posdata.XValueType = ChartValueType.Int32;
-            posdata.YValueType = ChartValueType.Int32;
+            posdata.XValueType = ChartValueType.Double;
+            posdata.YValueType = ChartValueType.Double;
             //Velocity Chart Init
             VelChart.Series.Add(veldata);
             veldata.Name = "Velocity Data";
             veldata.ChartType = SeriesChartType.Line;
             veldata.BorderWidth = 2;
             veldata.Color = Color.Purple;
-            veldata.XValueType = ChartValueType.Int32;
-            veldata.YValueType = ChartValueType.Int32;
+            veldata.XValueType = ChartValueType.Double;
+            veldata.YValueType = ChartValueType.Double;
             //Timer Initialization
             timer1.Interval = 100;
             timer1.Tick += new EventHandler(timer1_Tick);
@@ -53,15 +56,17 @@ namespace Mech423Lab3Ex4
         }
         private void ConBut_MouseClick(object sender, MouseEventArgs e)
         {
-/*            //For Testing purposes only
-           for (int i = 0; i < 50000; i++)
+            //For Testing purposes only
+            for (int i = 0; i < 50000; i++)
             {
-                int p = rnd.Next(1, 100);
+                double p = rnd.Next(-100, 100);
+                p = p * circ;
                 Posvalues.Enqueue(p);
-                int v = rnd.Next(1, 100);
+                double v= rnd.Next(-100, 100);
+                v = v * circ;
                 Velvalues.Enqueue(v);
             }
-            MessageBox.Show("Values Generated", "Notice");*/
+            MessageBox.Show("Values Generated", "Notice");
 
         }
         private void UpdateSeries()
