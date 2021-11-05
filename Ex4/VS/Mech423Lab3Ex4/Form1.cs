@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Collections.Concurrent;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
+using System.IO.Ports;
 
 namespace Mech423Lab3Ex4
 {
@@ -17,6 +18,10 @@ namespace Mech423Lab3Ex4
         ConcurrentQueue<double> Posvalues = new ConcurrentQueue<double>();
         ConcurrentQueue<double> Velvalues = new ConcurrentQueue<double>();
         ConcurrentQueue<Int32> databyte = new ConcurrentQueue<Int32>();
+        //Encoder Count storage
+        ConcurrentQueue<Int32> encoderUpCounts = new ConcurrentQueue<Int32>();
+        ConcurrentQueue<Int32> encoderDownCounts = new ConcurrentQueue<Int32>();
+        //Direction and PWM Bytes for DC motor Control
         ConcurrentQueue<Int32> DirectionByte = new ConcurrentQueue<Int32>();
         ConcurrentQueue<Int32> PWMByte = new ConcurrentQueue<Int32>();
         int x = 0;
@@ -27,6 +32,11 @@ namespace Mech423Lab3Ex4
         private static int dirval;
         private static int pwmval;
         private static int sliderticks = 8;
+        int halfticks = 0;
+        int bytesToRead = 0;
+        int is255 = 0;
+        //The divisor for velocity
+        double timeDiff = 1;
         Series posdata = new Series();
         Series veldata = new Series();
         Random rnd = new Random();
@@ -60,22 +70,27 @@ namespace Mech423Lab3Ex4
             timer2.Enabled = true;
             //Serial Port Init
             serialPort1.PortName = "COM5";
+            serialPort1.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);
+            //Variable Inits
+            sliderticks = SliCon.Maximum;
+            halfticks = sliderticks / 2;
+
 
         }
         private void ConBut_MouseClick(object sender, MouseEventArgs e)
         {
             serialPort1.Open();
             //For Testing purposes only
-           /* for (int i = 0; i < 50000; i++)
+            for (int i = 0; i < 50000; i++)
             {
                 double p = rnd.Next(-100, 100);
                 p = p * circ;
                 Posvalues.Enqueue(p);
-                double v= rnd.Next(-100, 100);
+                double v = rnd.Next(-100, 100);
                 v = v * circ;
                 Velvalues.Enqueue(v);
             }
-            MessageBox.Show("Values Generated", "Notice");*/
+            MessageBox.Show("Values Generated", "Notice");
 
         }
         private void UpdateSeries()
@@ -86,6 +101,8 @@ namespace Mech423Lab3Ex4
                 Velvalues.TryDequeue(out vval);
                 if (posdata.Points.Count() > 100) posdata.Points.RemoveAt(0);
                 if (veldata.Points.Count() > 100) veldata.Points.RemoveAt(0);
+                posBox.Text = pval.ToString();
+                velBox.Text = vval.ToString();
                 posdata.Points.AddXY(x, pval);
                 veldata.Points.AddXY(x, vval);
                 PosChart.ResetAutoValues();
@@ -98,10 +115,69 @@ namespace Mech423Lab3Ex4
                 MessageBox.Show("No More Data", "Error");
             }
         }
+        private void DataReceivedHandler(object sender, SerialDataReceivedEventArgs e)
+        {
+            int newByte = 0;
+            bytesToRead = serialPort1.BytesToRead;
+            while (bytesToRead != 0)
+            {
+                newByte = serialPort1.ReadByte();
+                databyte.Enqueue(newByte);
+                bytesToRead = serialPort1.BytesToRead;
+            }
+        }
+        //Converter converts values, performs math, calls UpdateSeries
+        private void Converter()
+        {
+            int upcount;
+            int downcount;
+            double position=0.0;
+            double velocityCPS;
+            double velocityRPM;
+            encoderUpCounts.TryDequeue(out upcount);
+            encoderDownCounts.TryDequeue(out downcount);
+            //TODO: Perform RPM conversion
+            velocityCPS = ((double)upcount - (double)downcount)/timeDiff;
+            VelCountBox.Text = velocityCPS.ToString();
+            velocityRPM = (velocityCPS * 60.0 / (20.4 * 48.0));
+            position = (position + ((velocityCPS * 0.2 * 4) / (20.4 * 48.0)));
+            Posvalues.Enqueue(position);
+            Velvalues.Enqueue(velocityRPM);
+            UpdateSeries();
 
+        }
+        //Only collects data from UART, calls Converter, currently collecting only 3 data bytes as opposed to 5
+        //Can modify as required
         private void timer1_Tick(object sender, EventArgs e)
         {
-            UpdateSeries();
+            if (serialPort1.IsOpen)
+            {
+                int valfromq;
+                bool queuenotempty;
+                queuenotempty= databyte.TryDequeue(out valfromq);
+                while (queuenotempty)
+                {
+                    switch (is255)
+                    {
+                        case 1:
+                            encoderUpCounts.Enqueue(valfromq);
+                            is255++;
+                            break;
+                        case 2:
+                            encoderDownCounts.Enqueue(valfromq);
+                            is255=0;
+                            break;
+                    }
+                    if (valfromq == 255)
+                    {
+                        is255 = 0;
+                        is255++;
+
+                    }
+                }
+
+            }
+            Converter();
         }
         private void PreparePackets(int direction, int pwm)
         {
@@ -214,58 +290,29 @@ namespace Mech423Lab3Ex4
             serialPort1.Write(PWM_Byte, 0, 5);
 
         }
-        //TODO: Variable method for changing and calculating based on slider ticks,
-        //Check if it is above or below 25
-        //Depending on distance from 25, or half of the ticks, then scale from 0-100, divide appropriately per tick spacing to end
         private void timer2_Tick(object sender, EventArgs e)
         {
+            int pwmscale = 100 / halfticks;
             if (SliConCheck.Checked)
             {
                 int sliderpos = SliCon.Value;
-
-                switch (sliderpos)
+                if (sliderpos == halfticks)
                 {
-                    case 8:
-                        //Assuming 1 is forwards
-                        dirval = 1;
-                        //25% PWM, each increment will represent another 25% increase
-                        pwmval = 0;
-                        break;
-                    case 7:
-                        dirval = 1;
-                        pwmval = 25;
-                        break;
-                    case 6:
-                        dirval = 1;
-                        pwmval = 50;
-                        break;
-                    case 5:
-                        dirval = 1;
-                        pwmval = 75;
-                        break;
-                    case 4:
-                        dirval = 0;
-                        pwmval = 100;
-                        break;
-                    case 3:
-                        //Assuming 2 is backwards
-                        dirval = 2;
-                        // 25% PWM, Each increment will represent 25% PWM
-                        pwmval = 75;
-                        break;
-                    case 2:
-                        dirval = 2;
-                        pwmval = 50;
-                        break;
-                    case 1:
-                        dirval = 2;
-                        pwmval = 25;
-                        break;
-                    case 0:
-                        dirval = 2;
-                        pwmval = 0;
-                        break;
+                    dirval = 0;
+                    pwmval = 0;
                 }
+                else if (sliderpos < halfticks)
+                {
+                    pwmval = (halfticks - sliderpos)*pwmscale;
+                    dirval = 2;
+                    
+                }
+                else if (sliderpos > halfticks)
+                {
+                    pwmval = (sliderpos - halfticks) * pwmscale;
+                    dirval = 1;
+                }
+                
                 //Send the read values to PreparePackets
                 PreparePackets(dirval, pwmval);
 
