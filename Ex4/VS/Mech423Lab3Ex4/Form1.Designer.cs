@@ -41,8 +41,12 @@ namespace Mech423Lab3Ex4
             this.PosChart = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.VelChart = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.PlotBut = new System.Windows.Forms.Button();
+            this.SliCon = new System.Windows.Forms.TrackBar();
+            this.SliConCheck = new System.Windows.Forms.CheckBox();
+            this.timer2 = new System.Windows.Forms.Timer(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.PosChart)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.VelChart)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.SliCon)).BeginInit();
             this.SuspendLayout();
             // 
             // timer1
@@ -51,9 +55,10 @@ namespace Mech423Lab3Ex4
             // 
             // ConBut
             // 
-            this.ConBut.Location = new System.Drawing.Point(163, 37);
+            this.ConBut.Location = new System.Drawing.Point(82, 19);
+            this.ConBut.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.ConBut.Name = "ConBut";
-            this.ConBut.Size = new System.Drawing.Size(128, 43);
+            this.ConBut.Size = new System.Drawing.Size(64, 22);
             this.ConBut.TabIndex = 0;
             this.ConBut.Text = "Connect";
             this.ConBut.UseVisualStyleBackColor = true;
@@ -61,9 +66,10 @@ namespace Mech423Lab3Ex4
             // 
             // textBox1
             // 
-            this.textBox1.Location = new System.Drawing.Point(36, 37);
+            this.textBox1.Location = new System.Drawing.Point(18, 19);
+            this.textBox1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(100, 31);
+            this.textBox1.Size = new System.Drawing.Size(52, 20);
             this.textBox1.TabIndex = 1;
             // 
             // PosChart
@@ -73,9 +79,10 @@ namespace Mech423Lab3Ex4
             this.PosChart.ImeMode = System.Windows.Forms.ImeMode.Off;
             legend1.Name = "Legend1";
             this.PosChart.Legends.Add(legend1);
-            this.PosChart.Location = new System.Drawing.Point(47, 103);
+            this.PosChart.Location = new System.Drawing.Point(24, 54);
+            this.PosChart.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.PosChart.Name = "PosChart";
-            this.PosChart.Size = new System.Drawing.Size(1285, 1091);
+            this.PosChart.Size = new System.Drawing.Size(642, 567);
             this.PosChart.TabIndex = 2;
             this.PosChart.Text = "PositionChart";
             // 
@@ -85,37 +92,62 @@ namespace Mech423Lab3Ex4
             this.VelChart.ChartAreas.Add(chartArea2);
             legend2.Name = "Legend1";
             this.VelChart.Legends.Add(legend2);
-            this.VelChart.Location = new System.Drawing.Point(1338, 103);
+            this.VelChart.Location = new System.Drawing.Point(669, 54);
+            this.VelChart.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.VelChart.Name = "VelChart";
-            this.VelChart.Size = new System.Drawing.Size(1297, 1091);
+            this.VelChart.Size = new System.Drawing.Size(648, 567);
             this.VelChart.TabIndex = 3;
             this.VelChart.Text = "VelocityChart";
             // 
             // PlotBut
             // 
-            this.PlotBut.Location = new System.Drawing.Point(391, 37);
+            this.PlotBut.Location = new System.Drawing.Point(196, 19);
+            this.PlotBut.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.PlotBut.Name = "PlotBut";
-            this.PlotBut.Size = new System.Drawing.Size(143, 43);
+            this.PlotBut.Size = new System.Drawing.Size(72, 22);
             this.PlotBut.TabIndex = 4;
             this.PlotBut.Text = "Plot";
             this.PlotBut.UseVisualStyleBackColor = true;
             this.PlotBut.MouseClick += new System.Windows.Forms.MouseEventHandler(this.PlotBut_MouseClick);
             // 
+            // SliCon
+            // 
+            this.SliCon.Location = new System.Drawing.Point(24, 667);
+            this.SliCon.Maximum = 50;
+            this.SliCon.Name = "SliCon";
+            this.SliCon.Size = new System.Drawing.Size(400, 45);
+            this.SliCon.TabIndex = 5;
+            this.SliCon.Value = 25;
+            // 
+            // SliConCheck
+            // 
+            this.SliConCheck.AutoSize = true;
+            this.SliConCheck.Location = new System.Drawing.Point(24, 644);
+            this.SliConCheck.Name = "SliConCheck";
+            this.SliConCheck.Size = new System.Drawing.Size(118, 17);
+            this.SliConCheck.TabIndex = 6;
+            this.SliConCheck.Text = "Slider Motor Control";
+            this.SliConCheck.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(2915, 1412);
+            this.ClientSize = new System.Drawing.Size(1282, 891);
+            this.Controls.Add(this.SliConCheck);
+            this.Controls.Add(this.SliCon);
             this.Controls.Add(this.PlotBut);
             this.Controls.Add(this.VelChart);
             this.Controls.Add(this.PosChart);
             this.Controls.Add(this.textBox1);
             this.Controls.Add(this.ConBut);
+            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.Name = "Form1";
             this.Text = "Form1";
             this.Load += new System.EventHandler(this.Form1_Load);
             ((System.ComponentModel.ISupportInitialize)(this.PosChart)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.VelChart)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.SliCon)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -130,6 +162,9 @@ namespace Mech423Lab3Ex4
         private System.Windows.Forms.DataVisualization.Charting.Chart PosChart;
         private System.Windows.Forms.DataVisualization.Charting.Chart VelChart;
         private System.Windows.Forms.Button PlotBut;
+        private System.Windows.Forms.TrackBar SliCon;
+        private System.Windows.Forms.CheckBox SliConCheck;
+        private System.Windows.Forms.Timer timer2;
     }
 }
 
