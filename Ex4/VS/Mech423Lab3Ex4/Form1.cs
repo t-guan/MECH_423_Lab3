@@ -66,7 +66,7 @@ namespace Mech423Lab3Ex4
             //Timer Initialization
             timer1.Interval = 100;
             timer1.Tick += new EventHandler(timer1_Tick);
-            timer1.Enabled = true;
+            //timer1.Enabled = true;
             timer2.Interval = 100;
             timer2.Tick += new EventHandler(timer2_Tick);
             timer2.Enabled = true;
@@ -324,6 +324,11 @@ namespace Mech423Lab3Ex4
         private void PlotBut_MouseClick(object sender, MouseEventArgs e)
         {
             timer3.Enabled = true;
+        }
+
+        private void button1_MouseClick(object sender, MouseEventArgs e)
+        {
+            timer1.Enabled = true;
         }
     }
 }

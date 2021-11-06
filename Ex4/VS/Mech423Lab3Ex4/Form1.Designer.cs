@@ -30,10 +30,10 @@ namespace Mech423Lab3Ex4
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend2 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea3 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend3 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea4 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend4 = new System.Windows.Forms.DataVisualization.Charting.Legend();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.serialPort1 = new System.IO.Ports.SerialPort(this.components);
             this.ConBut = new System.Windows.Forms.Button();
@@ -51,6 +51,7 @@ namespace Mech423Lab3Ex4
             this.label3 = new System.Windows.Forms.Label();
             this.VelCountBox = new System.Windows.Forms.TextBox();
             this.timer3 = new System.Windows.Forms.Timer(this.components);
+            this.button1 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.PosChart)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.VelChart)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.SliCon)).BeginInit();
@@ -81,11 +82,11 @@ namespace Mech423Lab3Ex4
             // 
             // PosChart
             // 
-            chartArea1.Name = "ChartArea1";
-            this.PosChart.ChartAreas.Add(chartArea1);
+            chartArea3.Name = "ChartArea1";
+            this.PosChart.ChartAreas.Add(chartArea3);
             this.PosChart.ImeMode = System.Windows.Forms.ImeMode.Off;
-            legend1.Name = "Legend1";
-            this.PosChart.Legends.Add(legend1);
+            legend3.Name = "Legend1";
+            this.PosChart.Legends.Add(legend3);
             this.PosChart.Location = new System.Drawing.Point(48, 104);
             this.PosChart.Margin = new System.Windows.Forms.Padding(4);
             this.PosChart.Name = "PosChart";
@@ -95,10 +96,10 @@ namespace Mech423Lab3Ex4
             // 
             // VelChart
             // 
-            chartArea2.Name = "ChartArea1";
-            this.VelChart.ChartAreas.Add(chartArea2);
-            legend2.Name = "Legend1";
-            this.VelChart.Legends.Add(legend2);
+            chartArea4.Name = "ChartArea1";
+            this.VelChart.ChartAreas.Add(chartArea4);
+            legend4.Name = "Legend1";
+            this.VelChart.Legends.Add(legend4);
             this.VelChart.Location = new System.Drawing.Point(1338, 104);
             this.VelChart.Margin = new System.Windows.Forms.Padding(4);
             this.VelChart.Name = "VelChart";
@@ -108,7 +109,7 @@ namespace Mech423Lab3Ex4
             // 
             // PlotBut
             // 
-            this.PlotBut.Location = new System.Drawing.Point(392, 37);
+            this.PlotBut.Location = new System.Drawing.Point(471, 37);
             this.PlotBut.Margin = new System.Windows.Forms.Padding(4);
             this.PlotBut.Name = "PlotBut";
             this.PlotBut.Size = new System.Drawing.Size(144, 42);
@@ -186,11 +187,23 @@ namespace Mech423Lab3Ex4
             this.VelCountBox.Size = new System.Drawing.Size(100, 31);
             this.VelCountBox.TabIndex = 11;
             // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(319, 37);
+            this.button1.Margin = new System.Windows.Forms.Padding(4);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(144, 42);
+            this.button1.TabIndex = 13;
+            this.button1.Text = "Data Collect";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.MouseClick += new System.Windows.Forms.MouseEventHandler(this.button1_MouseClick);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(2564, 1713);
+            this.Controls.Add(this.button1);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.VelCountBox);
             this.Controls.Add(this.label2);
@@ -235,6 +248,7 @@ namespace Mech423Lab3Ex4
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TextBox VelCountBox;
         private System.Windows.Forms.Timer timer3;
+        private System.Windows.Forms.Button button1;
     }
 }
 
