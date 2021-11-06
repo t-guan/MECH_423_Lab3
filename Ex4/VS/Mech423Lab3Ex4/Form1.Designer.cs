@@ -50,6 +50,7 @@ namespace Mech423Lab3Ex4
             this.velBox = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
             this.VelCountBox = new System.Windows.Forms.TextBox();
+            this.timer3 = new System.Windows.Forms.Timer(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.PosChart)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.VelChart)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.SliCon)).BeginInit();
@@ -62,7 +63,7 @@ namespace Mech423Lab3Ex4
             // ConBut
             // 
             this.ConBut.Location = new System.Drawing.Point(164, 37);
-            this.ConBut.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.ConBut.Margin = new System.Windows.Forms.Padding(4);
             this.ConBut.Name = "ConBut";
             this.ConBut.Size = new System.Drawing.Size(128, 42);
             this.ConBut.TabIndex = 0;
@@ -73,7 +74,7 @@ namespace Mech423Lab3Ex4
             // textBox1
             // 
             this.textBox1.Location = new System.Drawing.Point(36, 37);
-            this.textBox1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.textBox1.Margin = new System.Windows.Forms.Padding(4);
             this.textBox1.Name = "textBox1";
             this.textBox1.Size = new System.Drawing.Size(100, 31);
             this.textBox1.TabIndex = 1;
@@ -86,7 +87,7 @@ namespace Mech423Lab3Ex4
             legend1.Name = "Legend1";
             this.PosChart.Legends.Add(legend1);
             this.PosChart.Location = new System.Drawing.Point(48, 104);
-            this.PosChart.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.PosChart.Margin = new System.Windows.Forms.Padding(4);
             this.PosChart.Name = "PosChart";
             this.PosChart.Size = new System.Drawing.Size(1284, 1090);
             this.PosChart.TabIndex = 2;
@@ -99,7 +100,7 @@ namespace Mech423Lab3Ex4
             legend2.Name = "Legend1";
             this.VelChart.Legends.Add(legend2);
             this.VelChart.Location = new System.Drawing.Point(1338, 104);
-            this.VelChart.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.VelChart.Margin = new System.Windows.Forms.Padding(4);
             this.VelChart.Name = "VelChart";
             this.VelChart.Size = new System.Drawing.Size(1296, 1090);
             this.VelChart.TabIndex = 3;
@@ -108,7 +109,7 @@ namespace Mech423Lab3Ex4
             // PlotBut
             // 
             this.PlotBut.Location = new System.Drawing.Point(392, 37);
-            this.PlotBut.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.PlotBut.Margin = new System.Windows.Forms.Padding(4);
             this.PlotBut.Name = "PlotBut";
             this.PlotBut.Size = new System.Drawing.Size(144, 42);
             this.PlotBut.TabIndex = 4;
@@ -119,7 +120,7 @@ namespace Mech423Lab3Ex4
             // SliCon
             // 
             this.SliCon.Location = new System.Drawing.Point(48, 1361);
-            this.SliCon.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.SliCon.Margin = new System.Windows.Forms.Padding(6);
             this.SliCon.Maximum = 100;
             this.SliCon.Name = "SliCon";
             this.SliCon.Size = new System.Drawing.Size(800, 90);
@@ -130,7 +131,7 @@ namespace Mech423Lab3Ex4
             // 
             this.SliConCheck.AutoSize = true;
             this.SliConCheck.Location = new System.Drawing.Point(57, 1341);
-            this.SliConCheck.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
+            this.SliConCheck.Margin = new System.Windows.Forms.Padding(6);
             this.SliConCheck.Name = "SliConCheck";
             this.SliConCheck.Size = new System.Drawing.Size(235, 29);
             this.SliConCheck.TabIndex = 6;
@@ -203,7 +204,7 @@ namespace Mech423Lab3Ex4
             this.Controls.Add(this.PosChart);
             this.Controls.Add(this.textBox1);
             this.Controls.Add(this.ConBut);
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "Form1";
             this.Text = "Form1";
             this.Load += new System.EventHandler(this.Form1_Load);
@@ -233,6 +234,7 @@ namespace Mech423Lab3Ex4
         private System.Windows.Forms.TextBox velBox;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TextBox VelCountBox;
+        private System.Windows.Forms.Timer timer3;
     }
 }
 

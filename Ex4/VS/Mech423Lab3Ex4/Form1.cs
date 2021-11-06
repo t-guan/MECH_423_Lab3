@@ -66,9 +66,12 @@ namespace Mech423Lab3Ex4
             //Timer Initialization
             timer1.Interval = 100;
             timer1.Tick += new EventHandler(timer1_Tick);
+            timer1.Enabled = true;
             timer2.Interval = 100;
             timer2.Tick += new EventHandler(timer2_Tick);
             timer2.Enabled = true;
+            timer3.Interval = 100;
+            timer3.Tick += new EventHandler(timer3_Tick);
             //Serial Port Init
             serialPort1.PortName = "COM5";
             serialPort1.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);
@@ -100,7 +103,7 @@ namespace Mech423Lab3Ex4
             }
             else
             {
-                timer1.Enabled = false;
+                timer3.Enabled = false;
                 MessageBox.Show("No More Data", "Error");
             }
         }
@@ -143,7 +146,7 @@ namespace Mech423Lab3Ex4
             {
                 int valfromq;
                 bool queuenotempty;
-                queuenotempty= databyte.TryDequeue(out valfromq);
+                queuenotempty = databyte.TryDequeue(out valfromq);
                 while (queuenotempty)
                 {
                     switch (is255)
@@ -154,7 +157,7 @@ namespace Mech423Lab3Ex4
                             break;
                         case 2:
                             encoderDownCounts.Enqueue(valfromq);
-                            is255=0;
+                            is255 = 0;
                             break;
                     }
                     if (valfromq == 255)
@@ -166,7 +169,6 @@ namespace Mech423Lab3Ex4
                 }
 
             }
-            Converter();
         }
         private void PreparePackets(int direction, int pwm)
         {
@@ -314,10 +316,14 @@ namespace Mech423Lab3Ex4
                 prevsliderpos = sliderpos;
             }
         }
+        private void timer3_Tick(object sender, EventArgs e)
+        {
+            Converter();
+        }
 
         private void PlotBut_MouseClick(object sender, MouseEventArgs e)
         {
-            timer1.Enabled = true;
+            timer3.Enabled = true;
         }
     }
 }
