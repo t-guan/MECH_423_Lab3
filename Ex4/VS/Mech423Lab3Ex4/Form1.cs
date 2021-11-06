@@ -24,6 +24,7 @@ namespace Mech423Lab3Ex4
         //Direction and PWM Bytes for DC motor Control
         ConcurrentQueue<Int32> DirectionByte = new ConcurrentQueue<Int32>();
         ConcurrentQueue<Int32> PWMByte = new ConcurrentQueue<Int32>();
+        double position = 0.0;
         int x = 0;
         int value = 0;
         int counter = 0;
@@ -94,14 +95,15 @@ namespace Mech423Lab3Ex4
         }
         private void SumConverter(int upc, int doc)
         {
-            double position = 0.0;
+            
             double velocityCPS;
             double velocityRPM;
                 //TODO: Perform RPM conversion
                 velocityCPS = ((double)upc - (double)doc) / timeDiff;
                 VelCountBox.Text = velocityCPS.ToString();
                 velocityRPM = (velocityCPS * 60.0 / (20.4 * 12.0));
-                position = (position + ((velocityCPS * 0.25 * 4) / (20.4 * 48.0)));
+                position = position + ((velocityRPM * 8 * 3.14) / 60)*timeDiff;
+                //position = (position + ((velocityCPS * 0.25 * 4) / (20.4 * 48.0)));
                 if (posdata.Points.Count() > 100) posdata.Points.RemoveAt(0);
                 if (veldata.Points.Count() > 100) veldata.Points.RemoveAt(0);
                 posBox.Text = position.ToString();
@@ -195,6 +197,8 @@ namespace Mech423Lab3Ex4
                         dsum = dsum / avg;
                         SumConverter(usum, dsum);
                         counter = 0;
+                        usum = 0;
+                        dsum = 0;
                     }
                    // Converter();
 
