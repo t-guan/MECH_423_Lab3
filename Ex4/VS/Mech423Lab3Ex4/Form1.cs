@@ -32,7 +32,8 @@ namespace Mech423Lab3Ex4
         private static int dirval;
         private static int pwmval;
         private static int sliderticks = 8;
-        int halfticks = 0;
+        private int prevsliderpos = 999;
+        int halfticks;
         int bytesToRead = 0;
         int is255 = 0;
         //The divisor for velocity
@@ -80,18 +81,6 @@ namespace Mech423Lab3Ex4
         private void ConBut_MouseClick(object sender, MouseEventArgs e)
         {
             serialPort1.Open();
-            //For Testing purposes only
-            for (int i = 0; i < 50000; i++)
-            {
-                double p = rnd.Next(-100, 100);
-                p = p * circ;
-                Posvalues.Enqueue(p);
-                double v = rnd.Next(-100, 100);
-                v = v * circ;
-                Velvalues.Enqueue(v);
-            }
-            MessageBox.Show("Values Generated", "Notice");
-
         }
         private void UpdateSeries()
         {
@@ -235,7 +224,7 @@ namespace Mech423Lab3Ex4
             }
             else
             {
-                pwm = (int)((double)pwm / 100 * 65535);
+                pwm = (int)((1 - (double)pwm / 100) * 65535);
             }
             ushort pwmnum16 = Convert.ToUInt16(pwm);
             byte upperpwm = (byte)(pwmnum16 >> 8);
@@ -292,7 +281,7 @@ namespace Mech423Lab3Ex4
         }
         private void timer2_Tick(object sender, EventArgs e)
         {
-            int pwmscale = 100 / halfticks;
+            int pwmscale = (int)((double)100 / halfticks);
             if (SliConCheck.Checked)
             {
                 int sliderpos = SliCon.Value;
@@ -314,8 +303,15 @@ namespace Mech423Lab3Ex4
                 }
                 
                 //Send the read values to PreparePackets
-                PreparePackets(dirval, pwmval);
-
+                if ((sliderpos != prevsliderpos) && (prevsliderpos != 999))
+                {
+                    PreparePackets(dirval, pwmval);
+                }
+                else if (prevsliderpos == -999)
+                {
+                    PreparePackets(dirval, pwmval);
+                }
+                prevsliderpos = sliderpos;
             }
         }
 
