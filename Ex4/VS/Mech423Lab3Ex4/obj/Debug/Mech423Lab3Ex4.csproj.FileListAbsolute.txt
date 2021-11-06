@@ -8,3 +8,13 @@ C:\Users\Thomas\MECH423Lab3\MECH-423-Lab3-\Ex4\VS\Mech423Lab3Ex4\obj\Debug\Mech4
 C:\Users\Thomas\MECH423Lab3\MECH-423-Lab3-\Ex4\VS\Mech423Lab3Ex4\obj\Debug\Mech423Lab3Ex4.csproj.CoreCompileInputs.cache
 C:\Users\Thomas\MECH423Lab3\MECH-423-Lab3-\Ex4\VS\Mech423Lab3Ex4\obj\Debug\Mech423Lab3Ex4.exe
 C:\Users\Thomas\MECH423Lab3\MECH-423-Lab3-\Ex4\VS\Mech423Lab3Ex4\obj\Debug\Mech423Lab3Ex4.pdb
+C:\Users\jcast\github_repos\mech423\MECH_423_Lab3\Ex4\VS\Mech423Lab3Ex4\bin\Debug\Mech423Lab3Ex4.exe.config
+C:\Users\jcast\github_repos\mech423\MECH_423_Lab3\Ex4\VS\Mech423Lab3Ex4\bin\Debug\Mech423Lab3Ex4.exe
+C:\Users\jcast\github_repos\mech423\MECH_423_Lab3\Ex4\VS\Mech423Lab3Ex4\bin\Debug\Mech423Lab3Ex4.pdb
+C:\Users\jcast\github_repos\mech423\MECH_423_Lab3\Ex4\VS\Mech423Lab3Ex4\obj\Debug\Mech423Lab3Ex4.csproj.AssemblyReference.cache
+C:\Users\jcast\github_repos\mech423\MECH_423_Lab3\Ex4\VS\Mech423Lab3Ex4\obj\Debug\Mech423Lab3Ex4.Form1.resources
+C:\Users\jcast\github_repos\mech423\MECH_423_Lab3\Ex4\VS\Mech423Lab3Ex4\obj\Debug\Mech423Lab3Ex4.Properties.Resources.resources
+C:\Users\jcast\github_repos\mech423\MECH_423_Lab3\Ex4\VS\Mech423Lab3Ex4\obj\Debug\Mech423Lab3Ex4.csproj.GenerateResource.cache
+C:\Users\jcast\github_repos\mech423\MECH_423_Lab3\Ex4\VS\Mech423Lab3Ex4\obj\Debug\Mech423Lab3Ex4.csproj.CoreCompileInputs.cache
+C:\Users\jcast\github_repos\mech423\MECH_423_Lab3\Ex4\VS\Mech423Lab3Ex4\obj\Debug\Mech423Lab3Ex4.exe
+C:\Users\jcast\github_repos\mech423\MECH_423_Lab3\Ex4\VS\Mech423Lab3Ex4\obj\Debug\Mech423Lab3Ex4.pdb

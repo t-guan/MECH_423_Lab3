@@ -25,6 +25,11 @@ namespace Mech423Lab3Ex4
         ConcurrentQueue<Int32> DirectionByte = new ConcurrentQueue<Int32>();
         ConcurrentQueue<Int32> PWMByte = new ConcurrentQueue<Int32>();
         int x = 0;
+        int value = 0;
+        int counter = 0;
+        int usum = 0;
+        int dsum = 0;
+        int avg = 45;
         double pval = 0;
         double vval = 0;
         int freq = 1000;
@@ -64,14 +69,15 @@ namespace Mech423Lab3Ex4
             veldata.XValueType = ChartValueType.Double;
             veldata.YValueType = ChartValueType.Double;
             //Timer Initialization
-            timer1.Interval = 100;
+            timer1.Interval = 1000;
             timer1.Tick += new EventHandler(timer1_Tick);
-            //timer1.Enabled = true;
-            timer2.Interval = 100;
+            timer1.Enabled = true;
+            timer2.Interval = 1000;
             timer2.Tick += new EventHandler(timer2_Tick);
             timer2.Enabled = true;
-            timer3.Interval = 100;
+            timer3.Interval = 1000;
             timer3.Tick += new EventHandler(timer3_Tick);
+            timer3.Enabled = true;
             //Serial Port Init
             serialPort1.PortName = "COM5";
             serialPort1.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);
@@ -84,28 +90,29 @@ namespace Mech423Lab3Ex4
         private void ConBut_MouseClick(object sender, MouseEventArgs e)
         {
             serialPort1.Open();
+            ConBut.Text = "OPENED";
         }
-        private void UpdateSeries()
+        private void SumConverter(int upc, int doc)
         {
-            if (x < Posvalues.Count)
-            {
-                Posvalues.TryDequeue(out pval);
-                Velvalues.TryDequeue(out vval);
+            double position = 0.0;
+            double velocityCPS;
+            double velocityRPM;
+                //TODO: Perform RPM conversion
+                velocityCPS = ((double)upc - (double)doc) / timeDiff;
+                VelCountBox.Text = velocityCPS.ToString();
+                velocityRPM = (velocityCPS * 60.0 / (20.4 * 48.0));
+                //position = (position + ((velocityCPS * 0.2 * 4) / (20.4 * 48.0)));
+                /*            Posvalues.Enqueue(position);
+                            Velvalues.Enqueue(velocityRPM);*/
                 if (posdata.Points.Count() > 100) posdata.Points.RemoveAt(0);
                 if (veldata.Points.Count() > 100) veldata.Points.RemoveAt(0);
-                posBox.Text = pval.ToString();
-                velBox.Text = vval.ToString();
-                posdata.Points.AddXY(x, pval);
-                veldata.Points.AddXY(x, vval);
+                posBox.Text = position.ToString();
+                velBox.Text = velocityRPM.ToString();
+                posdata.Points.AddXY(x, position);
+                veldata.Points.AddXY(x, velocityRPM);
                 PosChart.ResetAutoValues();
                 VelChart.ResetAutoValues();
-                x++;
-            }
-            else
-            {
-                timer3.Enabled = false;
-                MessageBox.Show("No More Data", "Error");
-            }
+            
         }
         private void DataReceivedHandler(object sender, SerialDataReceivedEventArgs e)
         {
@@ -121,21 +128,32 @@ namespace Mech423Lab3Ex4
         //Converter converts values, performs math, calls UpdateSeries
         private void Converter()
         {
-            int upcount;
-            int downcount;
-            double position=0.0;
+            double position = 0.0;
             double velocityCPS;
             double velocityRPM;
-            encoderUpCounts.TryDequeue(out upcount);
-            encoderDownCounts.TryDequeue(out downcount);
-            //TODO: Perform RPM conversion
-            velocityCPS = ((double)upcount - (double)downcount)/timeDiff;
-            VelCountBox.Text = velocityCPS.ToString();
-            velocityRPM = (velocityCPS * 60.0 / (20.4 * 48.0));
-            position = (position + ((velocityCPS * 0.2 * 4) / (20.4 * 48.0)));
-            Posvalues.Enqueue(position);
-            Velvalues.Enqueue(velocityRPM);
-            UpdateSeries();
+            int upcount;
+            int downcount;
+            if (encoderUpCounts.TryDequeue(out upcount) && encoderDownCounts.TryDequeue(out downcount))
+            {
+                textBox1.Text = upcount.ToString();
+                textBox4.Text = downcount.ToString();
+                //TODO: Perform RPM conversion
+                velocityCPS = ((double)upcount - (double)downcount) / timeDiff;
+                VelCountBox.Text = velocityCPS.ToString();
+                velocityRPM = (velocityCPS * 60.0 / (20.4 * 48.0));
+                //position = (position + ((velocityCPS * 0.2 * 4) / (20.4 * 48.0)));
+                /*            Posvalues.Enqueue(position);
+                            Velvalues.Enqueue(velocityRPM);*/
+                if (posdata.Points.Count() > 100) posdata.Points.RemoveAt(0);
+                if (veldata.Points.Count() > 100) veldata.Points.RemoveAt(0);
+                posBox.Text = position.ToString();
+                velBox.Text = velocityRPM.ToString();
+                posdata.Points.AddXY(x, position);
+                veldata.Points.AddXY(x, velocityRPM);
+                PosChart.ResetAutoValues();
+                VelChart.ResetAutoValues();
+                x++;
+            }
 
         }
         //Only collects data from UART, calls Converter, currently collecting only 3 data bytes as opposed to 5
@@ -145,27 +163,45 @@ namespace Mech423Lab3Ex4
             if (serialPort1.IsOpen)
             {
                 int valfromq;
-                bool queuenotempty;
-                queuenotempty = databyte.TryDequeue(out valfromq);
-                while (queuenotempty)
+                while (databyte.TryDequeue(out valfromq))
                 {
                     switch (is255)
                     {
                         case 1:
                             encoderUpCounts.Enqueue(valfromq);
+                            textBox2.Text = valfromq.ToString();
                             is255++;
                             break;
                         case 2:
                             encoderDownCounts.Enqueue(valfromq);
+                            textBox3.Text = valfromq.ToString();
                             is255 = 0;
                             break;
                     }
                     if (valfromq == 255)
                     {
-                        is255 = 0;
-                        is255++;
-
+                        is255 = 1;
                     }
+                    counter++;
+                    if (counter > avg)
+                    {
+                        for (int i = 0; i < avg; i++)
+                        {
+                            encoderUpCounts.TryDequeue(out value);
+                            usum = usum + value;
+                        }
+                        usum = usum / avg;
+                        for (int i = 0; i < avg; i++)
+                        {
+                            encoderDownCounts.TryDequeue(out value);
+                            dsum = dsum + value;
+                        }
+                        dsum = dsum / avg;
+                        SumConverter(usum, dsum);
+                        counter = 0;
+                    }
+                   // Converter();
+
                 }
 
             }
@@ -318,17 +354,17 @@ namespace Mech423Lab3Ex4
         }
         private void timer3_Tick(object sender, EventArgs e)
         {
-            Converter();
+           // Converter();
         }
 
         private void PlotBut_MouseClick(object sender, MouseEventArgs e)
         {
-            timer3.Enabled = true;
+            
         }
 
         private void button1_MouseClick(object sender, MouseEventArgs e)
         {
-            timer1.Enabled = true;
+            
         }
     }
 }
