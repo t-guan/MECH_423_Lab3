@@ -15,8 +15,7 @@ namespace Mech423Lab3Ex4
 {
     public partial class Form1 : Form
     {
-        ConcurrentQueue<double> Posvalues = new ConcurrentQueue<double>();
-        ConcurrentQueue<double> Velvalues = new ConcurrentQueue<double>();
+        //Collect UART data
         ConcurrentQueue<Int32> databyte = new ConcurrentQueue<Int32>();
         //Encoder Count storage
         ConcurrentQueue<Int32> encoderUpCounts = new ConcurrentQueue<Int32>();
@@ -24,29 +23,28 @@ namespace Mech423Lab3Ex4
         //Direction and PWM Bytes for DC motor Control
         ConcurrentQueue<Int32> DirectionByte = new ConcurrentQueue<Int32>();
         ConcurrentQueue<Int32> PWMByte = new ConcurrentQueue<Int32>();
-        double position = 0.0;
         int x = 0;
         int value = 0;
         int counter = 0;
         int usum = 0;
         int dsum = 0;
         int avg = 45;
-        double pval = 0;
-        double vval = 0;
+        int halfticks;
+        int bytesToRead = 0;
+        int is255 = 0;
         int freq = 1000;
+        double position = 0.0;
         double circ = 0.523;
         private static int dirval;
         private static int pwmval;
         private static int sliderticks = 8;
         private int prevsliderpos = 999;
-        int halfticks;
-        int bytesToRead = 0;
-        int is255 = 0;
+
         //The divisor for velocity
         double timeDiff = 0.6;
         Series posdata = new Series();
         Series veldata = new Series();
-        Random rnd = new Random();
+        Series pwmdata = new Series();
         public Form1()
         {
             InitializeComponent();
@@ -69,6 +67,14 @@ namespace Mech423Lab3Ex4
             veldata.Color = Color.Purple;
             veldata.XValueType = ChartValueType.Double;
             veldata.YValueType = ChartValueType.Double;
+            //PWM RPM Chart Init
+            pwmrotchart.Series.Add(pwmdata);
+            pwmdata.Name = "PWM VS Rotation";
+            pwmdata.ChartType = SeriesChartType.Point;
+            pwmdata.BorderWidth = 2;
+            pwmdata.Color = Color.Purple;
+            pwmdata.XValueType = ChartValueType.Int32;
+            pwmdata.YValueType = ChartValueType.Double;
             //Timer Initialization
             timer1.Interval = 1000;
             timer1.Tick += new EventHandler(timer1_Tick);
@@ -76,43 +82,48 @@ namespace Mech423Lab3Ex4
             timer2.Interval = 1000;
             timer2.Tick += new EventHandler(timer2_Tick);
             timer2.Enabled = true;
-            timer3.Interval = 1000;
-            timer3.Tick += new EventHandler(timer3_Tick);
-            timer3.Enabled = true;
             //Serial Port Init
             serialPort1.PortName = "COM5";
             serialPort1.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);
             //Variable Inits
             sliderticks = SliCon.Maximum;
             halfticks = sliderticks / 2;
-
-
         }
         private void ConBut_MouseClick(object sender, MouseEventArgs e)
         {
-            serialPort1.Open();
-            ConBut.Text = "OPENED";
+
+            if (serialPort1.IsOpen==false)
+            {
+                serialPort1.Open();
+                ConBut.Text = "Disconnect";
+            }
+            if (serialPort1.IsOpen == true)
+            {
+                serialPort1.Close();
+                ConBut.Text = "Connect";
+            }
         }
         private void SumConverter(int upc, int doc)
         {
             
             double velocityCPS;
             double velocityRPM;
-                //TODO: Perform RPM conversion
-                velocityCPS = ((double)upc - (double)doc) / timeDiff;
-                VelCountBox.Text = velocityCPS.ToString();
-                velocityRPM = (velocityCPS * 60.0 / (20.4 * 12.0));
-                position = position + ((velocityRPM * 8 * 3.14) / 60)*timeDiff;
-                //position = (position + ((velocityCPS * 0.25 * 4) / (20.4 * 48.0)));
-                if (posdata.Points.Count() > 100) posdata.Points.RemoveAt(0);
-                if (veldata.Points.Count() > 100) veldata.Points.RemoveAt(0);
-                posBox.Text = position.ToString();
-                velBox.Text = velocityRPM.ToString();
-                posdata.Points.AddXY(x, position);
-                veldata.Points.AddXY(x, velocityRPM);
-                PosChart.ResetAutoValues();
-                VelChart.ResetAutoValues();
-            
+            velocityCPS = ((double)upc - (double)doc) / timeDiff;
+            VelCountBox.Text = velocityCPS.ToString();
+            velocityRPM = (velocityCPS * 60.0 / (20.4 * 12.0));
+            position = position + ((velocityRPM * 8 * 3.14) / 60)*timeDiff;
+            //position = (position + ((velocityCPS * 0.25 * 4) / (20.4 * 48.0)));
+            if (posdata.Points.Count() > 100) posdata.Points.RemoveAt(0);
+            if (veldata.Points.Count() > 100) veldata.Points.RemoveAt(0);
+            if (pwmdata.Points.Count() > 100) pwmdata.Points.RemoveAt(0);
+            posBox.Text = position.ToString();
+            velBox.Text = velocityRPM.ToString();
+            posdata.Points.AddXY(x, position);
+            veldata.Points.AddXY(x, velocityRPM);
+            pwmdata.Points.AddXY(pwmval, velocityCPS);
+            PosChart.ResetAutoValues();
+            VelChart.ResetAutoValues();
+            pwmrotchart.ResetAutoValues();
         }
         private void DataReceivedHandler(object sender, SerialDataReceivedEventArgs e)
         {
@@ -125,8 +136,8 @@ namespace Mech423Lab3Ex4
                 bytesToRead = serialPort1.BytesToRead;
             }
         }
-        //Converter converts values, performs math, calls UpdateSeries
-        private void Converter()
+        //Converter converts values, performs math, calls UpdateSeries, currently not in use
+/*        private void Converter()
         {
             double position = 0.0;
             double velocityCPS;
@@ -153,7 +164,7 @@ namespace Mech423Lab3Ex4
                 x++;
             }
 
-        }
+        }*/
         //Only collects data from UART, calls Converter, currently collecting only 3 data bytes as opposed to 5
         //Can modify as required
         private void timer1_Tick(object sender, EventArgs e)
@@ -351,20 +362,6 @@ namespace Mech423Lab3Ex4
                 }
                 prevsliderpos = sliderpos;
             }
-        }
-        private void timer3_Tick(object sender, EventArgs e)
-        {
-           // Converter();
-        }
-
-        private void PlotBut_MouseClick(object sender, MouseEventArgs e)
-        {
-            
-        }
-
-        private void button1_MouseClick(object sender, MouseEventArgs e)
-        {
-            
         }
     }
 }
