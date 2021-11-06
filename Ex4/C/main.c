@@ -32,6 +32,8 @@ unsigned char EscByte;
 unsigned int fullData;
 unsigned int l;
 unsigned int u;
+unsigned int upcount;
+unsigned int downcount;
 unsigned int maxTimerVal;
 unsigned int dutyTimerVal;
 unsigned int max;
@@ -50,8 +52,7 @@ int main(void)
     enableInterrupts();
 
     while(1) {
-        // FOR UART DEBUG
-        UCA1TXBUF = 43; // periodically transmit 'a' to serial port
+        UCA1TXBUF=43;
         while ((UCA1IFG & UCTXIFG) == 0);
         delayNOP(2000);
     }
@@ -93,6 +94,15 @@ void configureTimer(void)
     P2DIR  |= BIT1;
     P2SEL0 |= BIT1;
     P2SEL1 &= ~(BIT1);
+    //Set P1.1 and P1.2 to TA1 and TA0
+    P1DIR &= ~(BIT1+BIT2);
+    P1SEL1 |=(BIT1+BIT2);
+    P1SEL0 &= ~(BIT1+BIT2);
+    //Init Timer Counts
+    TA0CTL = TASSEL_0+MC_1;
+    TA1CTL = TASSEL_0+MC_1;
+    TA0CCR0 = 65535;
+    TA1CCR0 = 65535;
 
     TB2CCR0 = 2000; // Timer overflow value
     TB2CCR1 = 250;
@@ -115,7 +125,7 @@ void configureMiscPins(void)
 
 void enableInterrupts(void)
 {
-    UCA1IE |= UCRXIE; // enable Receive Interrupt, User Guide page 502
+    UCA1IE |= UCRXIE+UCTXIE; // enable Receive and Transfer Interrupt, User Guide page 502
     _EINT(); // global interrupt enable
 }
 
