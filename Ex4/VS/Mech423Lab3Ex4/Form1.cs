@@ -42,7 +42,7 @@ namespace Mech423Lab3Ex4
         int bytesToRead = 0;
         int is255 = 0;
         //The divisor for velocity
-        double timeDiff = 1;
+        double timeDiff = 0.6;
         Series posdata = new Series();
         Series veldata = new Series();
         Random rnd = new Random();
@@ -100,10 +100,8 @@ namespace Mech423Lab3Ex4
                 //TODO: Perform RPM conversion
                 velocityCPS = ((double)upc - (double)doc) / timeDiff;
                 VelCountBox.Text = velocityCPS.ToString();
-                velocityRPM = (velocityCPS * 60.0 / (20.4 * 48.0));
-                //position = (position + ((velocityCPS * 0.2 * 4) / (20.4 * 48.0)));
-                /*            Posvalues.Enqueue(position);
-                            Velvalues.Enqueue(velocityRPM);*/
+                velocityRPM = (velocityCPS * 60.0 / (20.4 * 12.0));
+                position = (position + ((velocityCPS * 0.25 * 4) / (20.4 * 48.0)));
                 if (posdata.Points.Count() > 100) posdata.Points.RemoveAt(0);
                 if (veldata.Points.Count() > 100) veldata.Points.RemoveAt(0);
                 posBox.Text = position.ToString();
@@ -140,10 +138,8 @@ namespace Mech423Lab3Ex4
                 //TODO: Perform RPM conversion
                 velocityCPS = ((double)upcount - (double)downcount) / timeDiff;
                 VelCountBox.Text = velocityCPS.ToString();
-                velocityRPM = (velocityCPS * 60.0 / (20.4 * 48.0));
-                //position = (position + ((velocityCPS * 0.2 * 4) / (20.4 * 48.0)));
-                /*            Posvalues.Enqueue(position);
-                            Velvalues.Enqueue(velocityRPM);*/
+                velocityRPM = (velocityCPS * 60.0 / (20.4 * 12.0));
+                position = (position + ((velocityCPS * 0.25 * 4) / (20.4 * 48.0)));
                 if (posdata.Points.Count() > 100) posdata.Points.RemoveAt(0);
                 if (veldata.Points.Count() > 100) veldata.Points.RemoveAt(0);
                 posBox.Text = position.ToString();
