@@ -52,9 +52,7 @@ int main(void)
     enableInterrupts();
 
     while(1) {
-        UCA1TXBUF=43;
-        while ((UCA1IFG & UCTXIFG) == 0);
-        delayNOP(2000);
+
     }
 }
 
@@ -125,7 +123,9 @@ void configureMiscPins(void)
 
 void enableInterrupts(void)
 {
-    UCA1IE |= UCRXIE+UCTXIE; // enable Receive and Transfer Interrupt, User Guide page 502
+    UCA1IE |= UCRXIE; // enable Receive and Transfer Interrupt, User Guide page 502
+    TB2CTL |= TBIE;
+    TB2CCTL0 |= CCIE;
     _EINT(); // global interrupt enable
 }
 
@@ -258,6 +258,21 @@ __interrupt void USCI_A1_ISR(void)
             packetIndex++;
         }
     }
+}
+
+#pragma vector = TIMER2_B0_VECTOR
+__interrupt void TimerBISR(void)
+{
+
+    UCA1TXBUF=255;
+    while ((UCA1IFG & UCTXIFG) == 0);
+    UCA1TXBUF=TA1R;
+    TA1R=0;
+    while ((UCA1IFG & UCTXIFG) == 0);
+    UCA1TXBUF=TA0R;
+    TA0R=0;
+    while ((UCA1IFG & UCTXIFG) == 0);
+
 }
 
 // CONNECTIONS
