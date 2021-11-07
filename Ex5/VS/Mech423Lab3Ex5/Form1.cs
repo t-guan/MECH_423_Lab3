@@ -7,9 +7,12 @@ using System.Drawing;
 using System.IO.Ports;
 using System.Linq;
 using System.Text;
+using System.IO;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Forms.DataVisualization.Charting;
+
+
 
 namespace Mech423Lab3Ex5
 {
@@ -51,6 +54,11 @@ namespace Mech423Lab3Ex5
         Series veldata = new Series();
         Series pwmdata = new Series();
 
+        // ----- FOR WRITINNG TO CSV -----
+        string path = @"C:\Users\Thomas\MECH423Lab3\MECH-423-Lab3-\Ex5\VS\values.csv";
+        string delim = ",";
+        StringBuilder csvout = new StringBuilder();
+
         public Form1()
         {
             InitializeComponent();
@@ -90,8 +98,9 @@ namespace Mech423Lab3Ex5
             timer2.Tick += new EventHandler(timer2_Tick);
             timer2.Enabled = true;
             //Serial Port Init
-            serialPort1.PortName = "COM5";
+            serialPort1.PortName = "COM7";
             serialPort1.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);
+            //serialPort1.Open();
             //Variable Inits
             halfticks = SliCon.Maximum / 2;
             pwmscale = (int)((double)100 / halfticks);
@@ -99,8 +108,9 @@ namespace Mech423Lab3Ex5
 
         private void ConBut_MouseClick(object sender, MouseEventArgs e)
         {
+            serialPort1.Open();
 
-            if (serialPort1.IsOpen == false)
+/*            if (serialPort1.IsOpen == false)
             {
                 serialPort1.Open();
                 ConBut.Text = "Disconnect";
@@ -109,7 +119,7 @@ namespace Mech423Lab3Ex5
             {
                 serialPort1.Close();
                 ConBut.Text = "Connect";
-            }
+            }*/
         }
 
         private void SumConverter(int upc, int doc)
@@ -119,17 +129,20 @@ namespace Mech423Lab3Ex5
             VelCountBox.Text = velocityCPS.ToString();
             double velocityRPM = (velocityCPS * 60.0 / (20.4 * 12.0));
             position = position + ((velocityRPM * 8 * 3.14) / 60) * timeDiff;
-
+            //Store values into CSV
+            csvout.AppendLine(x.ToString() + delim + velocityRPM.ToString());
+            File.WriteAllText(path, csvout.ToString());
+            File.AppendAllText(path, csvout.ToString());
             // only plot 100 datapoints
-            if (posdata.Points.Count() > 100) posdata.Points.RemoveAt(0);
-            if (veldata.Points.Count() > 100) veldata.Points.RemoveAt(0);
-            if (pwmdata.Points.Count() > 100) pwmdata.Points.RemoveAt(0);
+            if (posdata.Points.Count() > 1000) posdata.Points.RemoveAt(0);
+            if (veldata.Points.Count() > 1000) veldata.Points.RemoveAt(0);
+            if (pwmdata.Points.Count() > 1000) pwmdata.Points.RemoveAt(0);
 
             // actual plotting
             posBox.Text = position.ToString();
             velBox.Text = velocityRPM.ToString();
             posdata.Points.AddXY(x, position);
-            veldata.Points.AddXY(x, velocityRPM);
+            veldata.Points.AddXY(x, velocityRPM);   
             pwmdata.Points.AddXY(pwmval, velocityCPS);
             PosChart.ResetAutoValues();
             VelChart.ResetAutoValues();
@@ -153,7 +166,7 @@ namespace Mech423Lab3Ex5
         private void timer1_Tick(object sender, EventArgs e)
         {
             int counter = 0;
-            int usum, dsum;
+            int usum=0, dsum=0;
 
             if (serialPort1.IsOpen)
             {
@@ -167,19 +180,22 @@ namespace Mech423Lab3Ex5
                             break;
                         case 1:
                             encoderUpCounts.Enqueue(valfromq);
+                            usum = valfromq;
                             textBox2.Text = valfromq.ToString();
                             is255 = 2;
                             break;
                         case 2:
                             encoderDownCounts.Enqueue(valfromq);
+                            dsum = valfromq;
                             textBox3.Text = valfromq.ToString();
                             is255 = 0;
                             counter++; // increments here, so 1 counter increment == 1 full packet
                             break;
                     }
+                    SumConverter(usum, dsum);
 
                     // once enough data points collected, send to SumConverter()
-                    if (counter > avg)
+/*                    if (counter > avg)
                     {
                         usum = 0;
                         for (int i = 0; i < avg; i++)
@@ -203,7 +219,7 @@ namespace Mech423Lab3Ex5
 
                         SumConverter(usum, dsum);
                         counter = 0; // reset counter
-                    }
+                    }*/
                 }
             }
         }
@@ -364,17 +380,17 @@ namespace Mech423Lab3Ex5
 
         private void PWM_25_Button_MouseClick(object sender, MouseEventArgs e)
         {
-            PreparePackets(1, 25);
+            PreparePackets(2, 25);
         }
 
         private void PWM_50_Button_MouseClick(object sender, MouseEventArgs e)
         {
-            PreparePackets(1, 50);
+            PreparePackets(2, 50);
         }
 
         private void PWM_100_Button_MouseClick(object sender, MouseEventArgs e)
         {
-            PreparePackets(1, 100);
+            PreparePackets(2, 99);
         }
 
         private void PWM_Custom_Button_MouseClick(object sender, MouseEventArgs e)
@@ -383,7 +399,7 @@ namespace Mech423Lab3Ex5
             {
                 if ((custompwm >= 0) && (custompwm <= 100))
                 {
-                    PreparePackets(1, custompwm);
+                    PreparePackets(2, custompwm);
                 }
                 else
                 {

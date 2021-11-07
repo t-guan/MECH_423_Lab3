@@ -83,8 +83,9 @@ namespace Mech423Lab3Ex4
             timer2.Tick += new EventHandler(timer2_Tick);
             timer2.Enabled = true;
             //Serial Port Init
-            serialPort1.PortName = "COM5";
+            serialPort1.PortName = "COM7";
             serialPort1.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);
+            serialPort1.Open();
             //Variable Inits
             sliderticks = SliCon.Maximum;
             halfticks = sliderticks / 2;
@@ -92,11 +93,11 @@ namespace Mech423Lab3Ex4
         private void ConBut_MouseClick(object sender, MouseEventArgs e)
         {
 
-            if (serialPort1.IsOpen==false)
+/*            if (serialPort1.IsOpen==false)
             {
                 serialPort1.Open();
                 ConBut.Text = "Disconnect";
-            }
+            }*/
             if (serialPort1.IsOpen == true)
             {
                 serialPort1.Close();
