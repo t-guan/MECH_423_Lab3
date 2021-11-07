@@ -30,12 +30,12 @@ namespace Mech423Lab3Ex5
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea16 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend16 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea17 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend17 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea18 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend18 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend2 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea3 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend3 = new System.Windows.Forms.DataVisualization.Charting.Legend();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.serialPort1 = new System.IO.Ports.SerialPort(this.components);
             this.ConBut = new System.Windows.Forms.Button();
@@ -59,6 +59,8 @@ namespace Mech423Lab3Ex5
             this.PWM_25_Button = new System.Windows.Forms.Button();
             this.PWM_50_Button = new System.Windows.Forms.Button();
             this.PWM_100_Button = new System.Windows.Forms.Button();
+            this.PWM_Custom_Button = new System.Windows.Forms.Button();
+            this.PWM_Custom_Box = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.PosChart)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.VelChart)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.SliCon)).BeginInit();
@@ -90,11 +92,11 @@ namespace Mech423Lab3Ex5
             // 
             // PosChart
             // 
-            chartArea16.Name = "ChartArea1";
-            this.PosChart.ChartAreas.Add(chartArea16);
+            chartArea1.Name = "ChartArea1";
+            this.PosChart.ChartAreas.Add(chartArea1);
             this.PosChart.ImeMode = System.Windows.Forms.ImeMode.Off;
-            legend16.Name = "Legend1";
-            this.PosChart.Legends.Add(legend16);
+            legend1.Name = "Legend1";
+            this.PosChart.Legends.Add(legend1);
             this.PosChart.Location = new System.Drawing.Point(64, 129);
             this.PosChart.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
             this.PosChart.Name = "PosChart";
@@ -104,10 +106,10 @@ namespace Mech423Lab3Ex5
             // 
             // VelChart
             // 
-            chartArea17.Name = "ChartArea1";
-            this.VelChart.ChartAreas.Add(chartArea17);
-            legend17.Name = "Legend1";
-            this.VelChart.Legends.Add(legend17);
+            chartArea2.Name = "ChartArea1";
+            this.VelChart.ChartAreas.Add(chartArea2);
+            legend2.Name = "Legend1";
+            this.VelChart.Legends.Add(legend2);
             this.VelChart.Location = new System.Drawing.Point(1784, 129);
             this.VelChart.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
             this.VelChart.Name = "VelChart";
@@ -117,7 +119,7 @@ namespace Mech423Lab3Ex5
             // 
             // SliCon
             // 
-            this.SliCon.Location = new System.Drawing.Point(64, 1688);
+            this.SliCon.Location = new System.Drawing.Point(64, 1642);
             this.SliCon.Margin = new System.Windows.Forms.Padding(8, 7, 8, 7);
             this.SliCon.Maximum = 100;
             this.SliCon.Name = "SliCon";
@@ -128,7 +130,7 @@ namespace Mech423Lab3Ex5
             // SliConCheck
             // 
             this.SliConCheck.AutoSize = true;
-            this.SliConCheck.Location = new System.Drawing.Point(76, 1663);
+            this.SliConCheck.Location = new System.Drawing.Point(76, 1617);
             this.SliConCheck.Margin = new System.Windows.Forms.Padding(8, 7, 8, 7);
             this.SliConCheck.Name = "SliConCheck";
             this.SliConCheck.Size = new System.Drawing.Size(305, 36);
@@ -192,7 +194,7 @@ namespace Mech423Lab3Ex5
             // 
             // textBox2
             // 
-            this.textBox2.Location = new System.Drawing.Point(75, 1574);
+            this.textBox2.Location = new System.Drawing.Point(75, 1556);
             this.textBox2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.textBox2.Name = "textBox2";
             this.textBox2.Size = new System.Drawing.Size(132, 38);
@@ -200,7 +202,7 @@ namespace Mech423Lab3Ex5
             // 
             // textBox3
             // 
-            this.textBox3.Location = new System.Drawing.Point(219, 1574);
+            this.textBox3.Location = new System.Drawing.Point(219, 1556);
             this.textBox3.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.textBox3.Name = "textBox3";
             this.textBox3.Size = new System.Drawing.Size(132, 38);
@@ -208,7 +210,7 @@ namespace Mech423Lab3Ex5
             // 
             // textBox4
             // 
-            this.textBox4.Location = new System.Drawing.Point(371, 1574);
+            this.textBox4.Location = new System.Drawing.Point(371, 1556);
             this.textBox4.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.textBox4.Name = "textBox4";
             this.textBox4.Size = new System.Drawing.Size(132, 38);
@@ -216,11 +218,11 @@ namespace Mech423Lab3Ex5
             // 
             // pwmrotchart
             // 
-            chartArea18.Name = "ChartArea1";
-            this.pwmrotchart.ChartAreas.Add(chartArea18);
+            chartArea3.Name = "ChartArea1";
+            this.pwmrotchart.ChartAreas.Add(chartArea3);
             this.pwmrotchart.ImeMode = System.Windows.Forms.ImeMode.Off;
-            legend18.Name = "Legend1";
-            this.pwmrotchart.Legends.Add(legend18);
+            legend3.Name = "Legend1";
+            this.pwmrotchart.Legends.Add(legend3);
             this.pwmrotchart.Location = new System.Drawing.Point(1324, 1663);
             this.pwmrotchart.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
             this.pwmrotchart.Name = "pwmrotchart";
@@ -230,7 +232,7 @@ namespace Mech423Lab3Ex5
             // 
             // PWM_0_Button
             // 
-            this.PWM_0_Button.Location = new System.Drawing.Point(75, 1785);
+            this.PWM_0_Button.Location = new System.Drawing.Point(76, 1731);
             this.PWM_0_Button.Margin = new System.Windows.Forms.Padding(5);
             this.PWM_0_Button.Name = "PWM_0_Button";
             this.PWM_0_Button.Size = new System.Drawing.Size(209, 52);
@@ -241,7 +243,7 @@ namespace Mech423Lab3Ex5
             // 
             // PWM_25_Button
             // 
-            this.PWM_25_Button.Location = new System.Drawing.Point(313, 1785);
+            this.PWM_25_Button.Location = new System.Drawing.Point(295, 1731);
             this.PWM_25_Button.Margin = new System.Windows.Forms.Padding(5);
             this.PWM_25_Button.Name = "PWM_25_Button";
             this.PWM_25_Button.Size = new System.Drawing.Size(208, 52);
@@ -252,7 +254,7 @@ namespace Mech423Lab3Ex5
             // 
             // PWM_50_Button
             // 
-            this.PWM_50_Button.Location = new System.Drawing.Point(551, 1785);
+            this.PWM_50_Button.Location = new System.Drawing.Point(513, 1731);
             this.PWM_50_Button.Margin = new System.Windows.Forms.Padding(5);
             this.PWM_50_Button.Name = "PWM_50_Button";
             this.PWM_50_Button.Size = new System.Drawing.Size(208, 52);
@@ -263,7 +265,7 @@ namespace Mech423Lab3Ex5
             // 
             // PWM_100_Button
             // 
-            this.PWM_100_Button.Location = new System.Drawing.Point(795, 1785);
+            this.PWM_100_Button.Location = new System.Drawing.Point(731, 1731);
             this.PWM_100_Button.Margin = new System.Windows.Forms.Padding(5);
             this.PWM_100_Button.Name = "PWM_100_Button";
             this.PWM_100_Button.Size = new System.Drawing.Size(209, 52);
@@ -272,11 +274,33 @@ namespace Mech423Lab3Ex5
             this.PWM_100_Button.UseVisualStyleBackColor = true;
             this.PWM_100_Button.MouseClick += new System.Windows.Forms.MouseEventHandler(this.PWM_100_Button_MouseClick);
             // 
+            // PWM_Custom_Button
+            // 
+            this.PWM_Custom_Button.Location = new System.Drawing.Point(998, 1792);
+            this.PWM_Custom_Button.Margin = new System.Windows.Forms.Padding(5);
+            this.PWM_Custom_Button.Name = "PWM_Custom_Button";
+            this.PWM_Custom_Button.Size = new System.Drawing.Size(277, 52);
+            this.PWM_Custom_Button.TabIndex = 22;
+            this.PWM_Custom_Button.Text = "Custom% PWM";
+            this.PWM_Custom_Button.UseVisualStyleBackColor = true;
+            this.PWM_Custom_Button.MouseClick += new System.Windows.Forms.MouseEventHandler(this.PWM_Custom_Button_MouseClick);
+            // 
+            // PWM_Custom_Box
+            // 
+            this.PWM_Custom_Box.Location = new System.Drawing.Point(998, 1731);
+            this.PWM_Custom_Box.Margin = new System.Windows.Forms.Padding(4);
+            this.PWM_Custom_Box.Multiline = true;
+            this.PWM_Custom_Box.Name = "PWM_Custom_Box";
+            this.PWM_Custom_Box.Size = new System.Drawing.Size(277, 52);
+            this.PWM_Custom_Box.TabIndex = 23;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(16F, 31F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(3004, 2108);
+            this.Controls.Add(this.PWM_Custom_Box);
+            this.Controls.Add(this.PWM_Custom_Button);
             this.Controls.Add(this.PWM_100_Button);
             this.Controls.Add(this.PWM_50_Button);
             this.Controls.Add(this.PWM_25_Button);
@@ -335,6 +359,8 @@ namespace Mech423Lab3Ex5
         private System.Windows.Forms.Button PWM_25_Button;
         private System.Windows.Forms.Button PWM_50_Button;
         private System.Windows.Forms.Button PWM_100_Button;
+        private System.Windows.Forms.Button PWM_Custom_Button;
+        private System.Windows.Forms.TextBox PWM_Custom_Box;
     }
 }
 

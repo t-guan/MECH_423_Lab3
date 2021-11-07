@@ -376,5 +376,24 @@ namespace Mech423Lab3Ex5
         {
             PreparePackets(1, 100);
         }
+
+        private void PWM_Custom_Button_MouseClick(object sender, MouseEventArgs e)
+        {
+            if (Int32.TryParse(PWM_Custom_Box.Text, out int custompwm))
+            {
+                if ((custompwm >= 0) && (custompwm <= 100))
+                {
+                    PreparePackets(1, custompwm);
+                }
+                else
+                {
+                    MessageBox.Show("PWM outside of 0-100 range, No Action Taken", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+            else
+            {
+                MessageBox.Show("Invalid PWM input, No Action Taken", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
     }
 }
