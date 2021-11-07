@@ -29,6 +29,7 @@ unsigned char CmdByte;
 unsigned char LowerDataByte;
 unsigned char UpperDataByte;
 unsigned char EscByte;
+unsigned char garbageByte;
 unsigned int fullData;
 unsigned int l;
 unsigned int u;
@@ -52,7 +53,6 @@ int main(void)
     enableInterrupts();
 
     while(1) {
-
     }
 }
 
@@ -102,8 +102,8 @@ void configureTimer(void)
     TA0CCR0 = 65535;
     TA1CCR0 = 65535;
 
-    TB2CCR0 = 2000; // Timer overflow value
-    TB2CCR1 = 250;
+    TB2CCR0 = 15000; // Timer overflow value
+    TB2CCR1 = 500;
     TB2CCTL1 = OUTMOD_3;
     TB2CTL = TBSSEL_2 + MC_1; // SMCLK, UP mode
 }
@@ -117,8 +117,6 @@ void configureMiscPins(void)
     P3SEL1 &= ~(BIT6 + BIT7);
 
     // force one direction at start
-    P3OUT |= BIT6;
-    P3OUT &= ~(BIT7);
 }
 
 void enableInterrupts(void)
@@ -215,6 +213,15 @@ void processPWM(unsigned int data)
 
     // change timer value to duty cycle
     TB2CCR1 = (unsigned int)newTimerVal;
+
+    if (data == 0)
+    {
+        TB2CTL &= ~(MC_1);
+    }
+    else
+    {
+        TB2CTL |= MC_1;
+    }
 }
 
 void delayNOP(unsigned int cycles)
@@ -223,6 +230,24 @@ void delayNOP(unsigned int cycles)
     {
         _NOP();
     }
+}
+
+// returns 1 if packet is still valid
+// returns 0 if packet is invalid and buffer is reset
+int preservePacketFormat(unsigned char Rx)
+{
+    if (Rx == 255)
+    {
+        while (buffSize > 0)
+        {
+            garbageByte = dequeueBuffer();
+        }
+
+        packetIndex = 0;
+        return 0;
+    }
+
+    return 1;
 }
 
 #pragma vector = USCI_A1_VECTOR
@@ -243,19 +268,25 @@ __interrupt void USCI_A1_ISR(void)
     }
     else if (packetIndex == 4)
     {
-        if (buffSize < 50)
+        if (preservePacketFormat(RxByte) == 1)
         {
-            enqueueBuffer(RxByte);
-            processPacket();
-            packetIndex = 0;
+            if (buffSize < 50)
+            {
+                enqueueBuffer(RxByte);
+                processPacket();
+                packetIndex = 0;
+            }
         }
     }
     else
     {
-        if (buffSize < 50)
+        if (preservePacketFormat(RxByte) == 1)
         {
-            enqueueBuffer(RxByte);
-            packetIndex++;
+            if (buffSize < 50)
+            {
+                enqueueBuffer(RxByte);
+                packetIndex++;
+            }
         }
     }
 }
@@ -263,7 +294,7 @@ __interrupt void USCI_A1_ISR(void)
 #pragma vector = TIMER2_B0_VECTOR
 __interrupt void TimerBISR(void)
 {
-
+    while ((UCA1IFG & UCTXIFG) == 0);
     UCA1TXBUF=255;
     while ((UCA1IFG & UCTXIFG) == 0);
     UCA1TXBUF=TA1R;
@@ -273,6 +304,8 @@ __interrupt void TimerBISR(void)
     TA0R=0;
     while ((UCA1IFG & UCTXIFG) == 0);
 
+    TB2IV = 0;
+    TB2CTL &= ~TBIFG;
 }
 
 // CONNECTIONS
