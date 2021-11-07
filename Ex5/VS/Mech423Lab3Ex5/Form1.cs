@@ -356,5 +356,25 @@ namespace Mech423Lab3Ex5
                 prevsliderpos = sliderpos;
             }
         }
+
+        private void PWM_0_Button_MouseClick(object sender, MouseEventArgs e)
+        {
+            PreparePackets(0, 0);
+        }
+
+        private void PWM_25_Button_MouseClick(object sender, MouseEventArgs e)
+        {
+            PreparePackets(1, 25);
+        }
+
+        private void PWM_50_Button_MouseClick(object sender, MouseEventArgs e)
+        {
+            PreparePackets(1, 50);
+        }
+
+        private void PWM_100_Button_MouseClick(object sender, MouseEventArgs e)
+        {
+            PreparePackets(1, 100);
+        }
     }
 }
