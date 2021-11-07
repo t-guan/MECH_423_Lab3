@@ -15,40 +15,47 @@ namespace Mech423Lab3Ex5
 {
     public partial class Form1 : Form
     {
+        // ----- CONCURRENT QUEUES -----
+
         //Collect UART data
         ConcurrentQueue<Int32> databyte = new ConcurrentQueue<Int32>();
+
         //Encoder Count storage
         ConcurrentQueue<Int32> encoderUpCounts = new ConcurrentQueue<Int32>();
         ConcurrentQueue<Int32> encoderDownCounts = new ConcurrentQueue<Int32>();
+
         //Direction and PWM Bytes for DC motor Control
         ConcurrentQueue<Int32> DirectionByte = new ConcurrentQueue<Int32>();
         ConcurrentQueue<Int32> PWMByte = new ConcurrentQueue<Int32>();
-        int x = 0;
-        int value = 0;
-        int counter = 0;
-        int usum = 0;
-        int dsum = 0;
-        int avg = 45;
-        int halfticks;
-        int bytesToRead = 0;
-        int is255 = 0;
-        int freq = 1000;
-        double position = 0.0;
-        double circ = 0.523;
-        private static int dirval;
-        private static int pwmval;
-        private static int sliderticks = 8;
-        private int prevsliderpos = 999;
 
-        //The divisor for velocity
-        double timeDiff = 0.6;
+        // ----- ADJUSTABLE GLOBAL VARIABLES -----
+        int avg = 45; // for smoothing data (higher -> smoother, but updates less frequently)
+
+        // ----- 'ACTIVE' GLOBAL VARIABLES -----
+        int is255 = 0; // state variable for packets
+        int x = 0; // increments for plotting data
+        double position = 0.0; // current gantry position
+        int prevsliderpos = 999; // records prev slider position.. used to prevent sending too many packets
+        int dirval = 0; // sent to packet
+        int pwmval = 0; // sent to packet, also used for plotting
+
+        // ----- MISC GLOBAL VARIABLES -----
+        int halfticks; // 1/2 of slider ticks - used to zero slider posiion @ middle
+        int pwmscale; // scaling factor from slider ticks to pwm
+
+        double circ = 0.523; // circumference for rotation/displacement conversion
+        double timeDiff = 0.6; //The divisor for velocity
+
+        // ----- SERIES FOR DATA PLOTTING -----
         Series posdata = new Series();
         Series veldata = new Series();
         Series pwmdata = new Series();
+
         public Form1()
         {
             InitializeComponent();
         }
+
         private void Form1_Load(object sender, EventArgs e)
         {
             //Position Chart Init
@@ -86,9 +93,10 @@ namespace Mech423Lab3Ex5
             serialPort1.PortName = "COM5";
             serialPort1.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);
             //Variable Inits
-            sliderticks = SliCon.Maximum;
-            halfticks = sliderticks / 2;
+            halfticks = SliCon.Maximum / 2;
+            pwmscale = (int)((double)100 / halfticks);
         }
+
         private void ConBut_MouseClick(object sender, MouseEventArgs e)
         {
 
@@ -103,19 +111,21 @@ namespace Mech423Lab3Ex5
                 ConBut.Text = "Connect";
             }
         }
+
         private void SumConverter(int upc, int doc)
         {
-
-            double velocityCPS;
-            double velocityRPM;
-            velocityCPS = ((double)upc - (double)doc) / timeDiff;
+            // velocity, position calculations
+            double velocityCPS = ((double)upc - (double)doc) / timeDiff;
             VelCountBox.Text = velocityCPS.ToString();
-            velocityRPM = (velocityCPS * 60.0 / (20.4 * 12.0));
+            double velocityRPM = (velocityCPS * 60.0 / (20.4 * 12.0));
             position = position + ((velocityRPM * 8 * 3.14) / 60) * timeDiff;
-            //position = (position + ((velocityCPS * 0.25 * 4) / (20.4 * 48.0)));
+
+            // only plot 100 datapoints
             if (posdata.Points.Count() > 100) posdata.Points.RemoveAt(0);
             if (veldata.Points.Count() > 100) veldata.Points.RemoveAt(0);
             if (pwmdata.Points.Count() > 100) pwmdata.Points.RemoveAt(0);
+
+            // actual plotting
             posBox.Text = position.ToString();
             velBox.Text = velocityRPM.ToString();
             posdata.Points.AddXY(x, position);
@@ -124,99 +134,80 @@ namespace Mech423Lab3Ex5
             PosChart.ResetAutoValues();
             VelChart.ResetAutoValues();
             pwmrotchart.ResetAutoValues();
+            x++;
         }
+
         private void DataReceivedHandler(object sender, SerialDataReceivedEventArgs e)
         {
-            int newByte = 0;
-            bytesToRead = serialPort1.BytesToRead;
+            int bytesToRead = serialPort1.BytesToRead;
             while (bytesToRead != 0)
             {
-                newByte = serialPort1.ReadByte();
+                int newByte = serialPort1.ReadByte();
                 databyte.Enqueue(newByte);
                 bytesToRead = serialPort1.BytesToRead;
             }
         }
-        //Converter converts values, performs math, calls UpdateSeries, currently not in use
-        /*        private void Converter()
-                {
-                    double position = 0.0;
-                    double velocityCPS;
-                    double velocityRPM;
-                    int upcount;
-                    int downcount;
-                    if (encoderUpCounts.TryDequeue(out upcount) && encoderDownCounts.TryDequeue(out downcount))
-                    {
-                        textBox1.Text = upcount.ToString();
-                        textBox4.Text = downcount.ToString();
-                        //TODO: Perform RPM conversion
-                        velocityCPS = ((double)upcount - (double)downcount) / timeDiff;
-                        VelCountBox.Text = velocityCPS.ToString();
-                        velocityRPM = (velocityCPS * 60.0 / (20.4 * 12.0));
-                        position = (position + ((velocityCPS * 0.25 * 4) / (20.4 * 48.0)));
-                        if (posdata.Points.Count() > 100) posdata.Points.RemoveAt(0);
-                        if (veldata.Points.Count() > 100) veldata.Points.RemoveAt(0);
-                        posBox.Text = position.ToString();
-                        velBox.Text = velocityRPM.ToString();
-                        posdata.Points.AddXY(x, position);
-                        veldata.Points.AddXY(x, velocityRPM);
-                        PosChart.ResetAutoValues();
-                        VelChart.ResetAutoValues();
-                        x++;
-                    }
 
-                }*/
-        //Only collects data from UART, calls Converter, currently collecting only 3 data bytes as opposed to 5
+        //Only collects data from UART, calls SumConverter, currently collecting only 3 data bytes as opposed to 5
         //Can modify as required
         private void timer1_Tick(object sender, EventArgs e)
         {
+            int counter = 0;
+            int usum, dsum;
+
             if (serialPort1.IsOpen)
             {
-                int valfromq;
-                while (databyte.TryDequeue(out valfromq))
+                while (databyte.TryDequeue(out int valfromq))
                 {
+                    // state machine
                     switch (is255)
                     {
+                        case 0:
+                            if (valfromq == 255) { is255 = 1; }
+                            break;
                         case 1:
                             encoderUpCounts.Enqueue(valfromq);
                             textBox2.Text = valfromq.ToString();
-                            is255++;
+                            is255 = 2;
                             break;
                         case 2:
                             encoderDownCounts.Enqueue(valfromq);
                             textBox3.Text = valfromq.ToString();
                             is255 = 0;
+                            counter++; // increments here, so 1 counter increment == 1 full packet
                             break;
                     }
-                    if (valfromq == 255)
-                    {
-                        is255 = 1;
-                    }
-                    counter++;
+
+                    // once enough data points collected, send to SumConverter()
                     if (counter > avg)
                     {
+                        usum = 0;
                         for (int i = 0; i < avg; i++)
                         {
-                            encoderUpCounts.TryDequeue(out value);
-                            usum = usum + value;
+                            if (encoderUpCounts.TryDequeue(out int value))
+                            {
+                                usum = usum + value;
+                            }
                         }
                         usum = usum / avg;
+
+                        dsum = 0;
                         for (int i = 0; i < avg; i++)
                         {
-                            encoderDownCounts.TryDequeue(out value);
-                            dsum = dsum + value;
+                            if (encoderDownCounts.TryDequeue(out int value))
+                            {
+                                dsum = dsum + value;
+                            }
                         }
                         dsum = dsum / avg;
+
                         SumConverter(usum, dsum);
-                        counter = 0;
-                        usum = 0;
-                        dsum = 0;
+                        counter = 0; // reset counter
                     }
-                    // Converter();
-
                 }
-
             }
         }
+
         private void PreparePackets(int direction, int pwm)
         {
             if (direction == 0 || direction == 1 || direction == 2)
@@ -237,6 +228,7 @@ namespace Mech423Lab3Ex5
                 MessageBox.Show("Invalid Direction, No Action Taken", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
         private void PrepareDirPacket(int direction)
         {
             //Enqueue first byte
@@ -249,18 +241,19 @@ namespace Mech423Lab3Ex5
                 DirectionByte.Enqueue(0);
             }
         }
+
         private void DestroyPackets()
         {
-            int garbage;
             while (DirectionByte.Count > 0)
             {
-                DirectionByte.TryDequeue(out garbage);
+                DirectionByte.TryDequeue(out _);
             }
             while (PWMByte.Count > 0)
             {
-                PWMByte.TryDequeue(out garbage);
+                PWMByte.TryDequeue(out _);
             }
         }
+
         private void PreparePWMPacket(int pwm)
         {
             if (pwm > 100)
@@ -312,6 +305,7 @@ namespace Mech423Lab3Ex5
             // Enqueue escape byte
             PWMByte.Enqueue(esc);
         }
+
         private void SendPackets()
         {
             byte[] Dir_Byte = { 0, 0, 0, 0, 0 };
@@ -326,11 +320,11 @@ namespace Mech423Lab3Ex5
             }
             serialPort1.Write(Dir_Byte, 0, 5);
             serialPort1.Write(PWM_Byte, 0, 5);
-
         }
+
         private void timer2_Tick(object sender, EventArgs e)
         {
-            int pwmscale = (int)((double)100 / halfticks);
+            int dirval, pwmval;
             if (SliConCheck.Checked)
             {
                 int sliderpos = SliCon.Value;
@@ -343,9 +337,8 @@ namespace Mech423Lab3Ex5
                 {
                     pwmval = (halfticks - sliderpos) * pwmscale;
                     dirval = 2;
-
                 }
-                else if (sliderpos > halfticks)
+                else
                 {
                     pwmval = (sliderpos - halfticks) * pwmscale;
                     dirval = 1;
@@ -356,7 +349,7 @@ namespace Mech423Lab3Ex5
                 {
                     PreparePackets(dirval, pwmval);
                 }
-                else if (prevsliderpos == -999)
+                else if (prevsliderpos == 999)
                 {
                     PreparePackets(dirval, pwmval);
                 }
