@@ -1,5 +1,5 @@
 #include <msp430.h> 
-#include <PIDControl>
+
 // configuration functions
 void configureCS(void);
 void configureUART(void);
@@ -41,15 +41,15 @@ unsigned int max;
 unsigned int ref;
 unsigned int fb;
 unsigned int on;
-unsigned int CurrPWM;
-unsigned int targetPWM;
-unsigned int targetpos;
-unsigned int currpos;
+unsigned int CurrPWM=7000;
+unsigned int targetPWM=6553;
+double targetpos=10;
+double currpos;
 
 double duty;
 double newTimerVal;
 double error;
-double Kp;
+double Kp=7;
 
 int i;
 
@@ -68,30 +68,32 @@ int main(void)
         downcount=TA0R;
         TA1R=0;
         TA0R=0;
-        currpos=currpos+(upcount-downcount)*8*3.1416/(20.4*12);
+        currpos=currpos+(upcount-downcount)*2*8*3.1416/(20.4*12);
         //Just for protection purposes
-        if(currpos>150)
+/*        if(currpos>150)
         {
             currpos=150;
-        }
+            P3OUT |= BIT7;
+            P3OUT &= ~(BIT6);
+        }*/
         error=targetpos-currpos;
-        if(error<0){
-            CurrPWM=-error*kp;
+        if(error<0.0){
+            CurrPWM=-(error*Kp);
         }
         else{
-            CurrPWM=error*kp;
+            CurrPWM=(error*Kp);
         }
         if(CurrPWM>targetPWM){
             CurrPWM=targetPWM;
         }
-        else if(CurrPWM<targetPWM){
+ /*       else if(CurrPWM<targetPWM){
             CurrPWM=targetPWM;
-        }
-        processPWM(CurrPWM);
+        }*/
+        processPWM((int)CurrPWM);
         //Error Compensation, moving in the CW direction is positive position, CCW in the negative direction
         //Therefore, positive error needs to be compensated by moving in the opposite direction and vice versa
         //Change this if it is required.
-        if(error>0.5){
+       if(error>0.5){
             P3OUT |= BIT7;
             P3OUT &= ~(BIT6);
         }
@@ -100,7 +102,7 @@ int main(void)
             P3OUT &= ~(BIT7);
         }
         else
-            P3OUT &=~(BIT1+BIT2);
+            P3OUT &=~(BIT6+BIT7);
     }
 
 }
@@ -152,7 +154,7 @@ void configureTimer(void)
     TA1CCR0 = 65535;
 
     TB2CCR0 = 15000; // Timer overflow value
-    TB2CCR1 = 500;
+    TB2CCR1 = 0;
     TB2CCTL1 = OUTMOD_3;
     TB2CTL = TBSSEL_2 + MC_1; // SMCLK, UP mode
 }
@@ -171,8 +173,8 @@ void configureMiscPins(void)
 void enableInterrupts(void)
 {
     UCA1IE |= UCRXIE; // enable Receive and Transfer Interrupt, User Guide page 502
-    TB2CTL |= TBIE;
-    TB2CCTL0 |= CCIE;
+/*    TB2CTL |= TBIE;
+    TB2CCTL0 |= CCIE;*/
     _EINT(); // global interrupt enable
 }
 
@@ -225,7 +227,7 @@ void processPacket(void)
     fullData = combineBytes(LowerDataByte, UpperDataByte);
 
 
-    if (CmdByte == 0)
+    /*if (CmdByte == 0)
     {
         processPWM(fullData); // changes PWM
     }
@@ -240,7 +242,7 @@ void processPacket(void)
         // change dir to cw
         P3OUT |= BIT6;
         P3OUT &= ~(BIT7);
-    }
+    }*/
     //Set target PWM
     if (CmdByte ==3 )
     {
@@ -275,7 +277,7 @@ void processPWM(unsigned int data)
 
     if (data == 0)
     {
-        TB2CTL &= ~(MC_1);
+        TB2CTL |= MC_0;
     }
     else
     {
