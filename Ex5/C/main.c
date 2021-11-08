@@ -33,18 +33,18 @@ unsigned char garbageByte;
 unsigned int fullData;
 unsigned int l;
 unsigned int u;
-unsigned int upcount;
-unsigned int downcount;
+int upcount;
+int downcount;
 unsigned int maxTimerVal;
 unsigned int dutyTimerVal;
 unsigned int max;
 unsigned int ref;
 unsigned int fb;
 unsigned int on;
-int CurrPWM=10;
+int CurrPWM=0;
 unsigned int ConvertedPWM;
-int targetPWM=50;
-double targetpos=10;
+int targetPWM=0;
+double targetpos=0;
 double currpos=0;
 
 double duty;
@@ -69,7 +69,7 @@ int main(void)
         downcount=TA0R;
         TA1R=0;
         TA0R=0;
-        currpos=currpos+(upcount-downcount)*2*8*3.1416/(20.4*12);
+        currpos=currpos+((double)upcount-(double)downcount)*2*8*3.1416/(20.4*12);
         //Just for protection purposes
 /*        if(currpos>150)
         {
@@ -95,16 +95,20 @@ int main(void)
         //Error Compensation, moving in the CW direction is positive position, CCW in the negative direction
         //Therefore, positive error needs to be compensated by moving in the opposite direction and vice versa
         //Change this if it is required.
-       if(error>0.5){
+       if(error<-0.5){
             P3OUT |= BIT7;
             P3OUT &= ~(BIT6);
+            TB2CTL |= MC_1;
         }
-        else if(error<-0.5){
+        else if(error>0.5){
             P3OUT |= BIT6;
             P3OUT &= ~(BIT7);
+            TB2CTL |= MC_1;
         }
-        else
+        else{
             P3OUT &=~(BIT6+BIT7);
+            TB2CTL &= ~(MC_1);
+        }
     }
 
 }
