@@ -41,7 +41,7 @@ namespace Mech423Lab3Ex4
         private int prevsliderpos = 999;
 
         //The divisor for velocity
-        double timeDiff = 0.6;
+        double timeDiff = 0.015;
         Series posdata = new Series();
         Series veldata = new Series();
         Series pwmdata = new Series();
@@ -85,7 +85,6 @@ namespace Mech423Lab3Ex4
             //Serial Port Init
             serialPort1.PortName = "COM7";
             serialPort1.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);
-            serialPort1.Open();
             //Variable Inits
             sliderticks = SliCon.Maximum;
             halfticks = sliderticks / 2;
@@ -93,12 +92,12 @@ namespace Mech423Lab3Ex4
         private void ConBut_MouseClick(object sender, MouseEventArgs e)
         {
 
-/*            if (serialPort1.IsOpen==false)
+            if (serialPort1.IsOpen == false)
             {
                 serialPort1.Open();
                 ConBut.Text = "Disconnect";
-            }*/
-            if (serialPort1.IsOpen == true)
+            }
+            else if (serialPort1.IsOpen == true)
             {
                 serialPort1.Close();
                 ConBut.Text = "Connect";
@@ -111,7 +110,7 @@ namespace Mech423Lab3Ex4
             double velocityRPM;
             velocityCPS = ((double)upc - (double)doc) / timeDiff;
             VelCountBox.Text = velocityCPS.ToString();
-            velocityRPM = (velocityCPS * 60.0 / (20.4 * 12.0));
+            velocityRPM = (velocityCPS * 240.0 / (20.4 * 12.0));
             position = position + ((velocityRPM * 8 * 3.14) / 60)*timeDiff;
             //position = (position + ((velocityCPS * 0.25 * 4) / (20.4 * 48.0)));
             if (posdata.Points.Count() > 100) posdata.Points.RemoveAt(0);

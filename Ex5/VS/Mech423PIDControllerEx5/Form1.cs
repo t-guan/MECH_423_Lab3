@@ -97,7 +97,7 @@ namespace Mech423PIDControllerEx5
                 serialPort1.Open();
                 ConBut.Text = "Disconnect";
             }
-            if (serialPort1.IsOpen == true)
+            else if (serialPort1.IsOpen == true)
             {
                 serialPort1.Close();
                 ConBut.Text = "Connect";
@@ -192,9 +192,9 @@ namespace Mech423PIDControllerEx5
             //Enqueue direction byte
             PositionByte.Enqueue(4);
             //Fill rest with Zeros
-            if (position > 163)
+            if (position > 150)
             {
-                position = 163;
+                position = 150;
             }
             else if (position < 0)
             {
