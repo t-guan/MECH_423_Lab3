@@ -30,17 +30,16 @@ namespace Mech423PIDControllerEx5
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea3 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend3 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea4 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend4 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea7 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend7 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea8 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend8 = new System.Windows.Forms.DataVisualization.Charting.Legend();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.serialPort1 = new System.IO.Ports.SerialPort(this.components);
             this.ConBut = new System.Windows.Forms.Button();
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.PosChart = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.VelChart = new System.Windows.Forms.DataVisualization.Charting.Chart();
-            this.timer2 = new System.Windows.Forms.Timer(this.components);
             this.posBox = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
@@ -49,9 +48,9 @@ namespace Mech423PIDControllerEx5
             this.VelCountBox = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
-            this.textBox2 = new System.Windows.Forms.TextBox();
-            this.textBox3 = new System.Windows.Forms.TextBox();
-            this.button1 = new System.Windows.Forms.Button();
+            this.targetPWMbox = new System.Windows.Forms.TextBox();
+            this.targetPositionbox = new System.Windows.Forms.TextBox();
+            this.sendCtrlbut = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.PosChart)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.VelChart)).BeginInit();
             this.SuspendLayout();
@@ -81,11 +80,11 @@ namespace Mech423PIDControllerEx5
             // 
             // PosChart
             // 
-            chartArea3.Name = "ChartArea1";
-            this.PosChart.ChartAreas.Add(chartArea3);
+            chartArea7.Name = "ChartArea1";
+            this.PosChart.ChartAreas.Add(chartArea7);
             this.PosChart.ImeMode = System.Windows.Forms.ImeMode.Off;
-            legend3.Name = "Legend1";
-            this.PosChart.Legends.Add(legend3);
+            legend7.Name = "Legend1";
+            this.PosChart.Legends.Add(legend7);
             this.PosChart.Location = new System.Drawing.Point(48, 104);
             this.PosChart.Margin = new System.Windows.Forms.Padding(4);
             this.PosChart.Name = "PosChart";
@@ -95,10 +94,10 @@ namespace Mech423PIDControllerEx5
             // 
             // VelChart
             // 
-            chartArea4.Name = "ChartArea1";
-            this.VelChart.ChartAreas.Add(chartArea4);
-            legend4.Name = "Legend1";
-            this.VelChart.Legends.Add(legend4);
+            chartArea8.Name = "ChartArea1";
+            this.VelChart.ChartAreas.Add(chartArea8);
+            legend8.Name = "Legend1";
+            this.VelChart.Legends.Add(legend8);
             this.VelChart.Location = new System.Drawing.Point(1338, 104);
             this.VelChart.Margin = new System.Windows.Forms.Padding(4);
             this.VelChart.Name = "VelChart";
@@ -172,38 +171,39 @@ namespace Mech423PIDControllerEx5
             this.label5.TabIndex = 14;
             this.label5.Text = "Target Position";
             // 
-            // textBox2
+            // targetPWMbox
             // 
-            this.textBox2.Location = new System.Drawing.Point(65, 1328);
-            this.textBox2.Name = "textBox2";
-            this.textBox2.Size = new System.Drawing.Size(100, 31);
-            this.textBox2.TabIndex = 15;
+            this.targetPWMbox.Location = new System.Drawing.Point(65, 1328);
+            this.targetPWMbox.Name = "targetPWMbox";
+            this.targetPWMbox.Size = new System.Drawing.Size(100, 31);
+            this.targetPWMbox.TabIndex = 15;
             // 
-            // textBox3
+            // targetPositionbox
             // 
-            this.textBox3.Location = new System.Drawing.Point(242, 1328);
-            this.textBox3.Name = "textBox3";
-            this.textBox3.Size = new System.Drawing.Size(100, 31);
-            this.textBox3.TabIndex = 16;
+            this.targetPositionbox.Location = new System.Drawing.Point(242, 1328);
+            this.targetPositionbox.Name = "targetPositionbox";
+            this.targetPositionbox.Size = new System.Drawing.Size(100, 31);
+            this.targetPositionbox.TabIndex = 16;
             // 
-            // button1
+            // sendCtrlbut
             // 
-            this.button1.Location = new System.Drawing.Point(400, 1322);
-            this.button1.Margin = new System.Windows.Forms.Padding(4);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(128, 42);
-            this.button1.TabIndex = 17;
-            this.button1.Text = "Send";
-            this.button1.UseVisualStyleBackColor = true;
+            this.sendCtrlbut.Location = new System.Drawing.Point(400, 1322);
+            this.sendCtrlbut.Margin = new System.Windows.Forms.Padding(4);
+            this.sendCtrlbut.Name = "sendCtrlbut";
+            this.sendCtrlbut.Size = new System.Drawing.Size(128, 42);
+            this.sendCtrlbut.TabIndex = 17;
+            this.sendCtrlbut.Text = "Send";
+            this.sendCtrlbut.UseVisualStyleBackColor = true;
+            this.sendCtrlbut.MouseClick += new System.Windows.Forms.MouseEventHandler(this.sendCtrlbut_MouseClick);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(2253, 1793);
-            this.Controls.Add(this.button1);
-            this.Controls.Add(this.textBox3);
-            this.Controls.Add(this.textBox2);
+            this.Controls.Add(this.sendCtrlbut);
+            this.Controls.Add(this.targetPositionbox);
+            this.Controls.Add(this.targetPWMbox);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.label3);
@@ -235,7 +235,6 @@ namespace Mech423PIDControllerEx5
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.DataVisualization.Charting.Chart PosChart;
         private System.Windows.Forms.DataVisualization.Charting.Chart VelChart;
-        private System.Windows.Forms.Timer timer2;
         private System.Windows.Forms.TextBox posBox;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
@@ -244,9 +243,9 @@ namespace Mech423PIDControllerEx5
         private System.Windows.Forms.TextBox VelCountBox;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.TextBox textBox2;
-        private System.Windows.Forms.TextBox textBox3;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.TextBox targetPWMbox;
+        private System.Windows.Forms.TextBox targetPositionbox;
+        private System.Windows.Forms.Button sendCtrlbut;
     }
 }
 

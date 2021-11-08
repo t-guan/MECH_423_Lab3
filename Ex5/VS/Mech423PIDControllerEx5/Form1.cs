@@ -22,7 +22,7 @@ namespace Mech423PIDControllerEx5
         ConcurrentQueue<Int32> encoderUpCounts = new ConcurrentQueue<Int32>();
         ConcurrentQueue<Int32> encoderDownCounts = new ConcurrentQueue<Int32>();
         //Direction and PWM Bytes for DC motor Control
-        ConcurrentQueue<Int32> DirectionByte = new ConcurrentQueue<Int32>();
+        ConcurrentQueue<Int32> PositionByte = new ConcurrentQueue<Int32>();
         ConcurrentQueue<Int32> PWMByte = new ConcurrentQueue<Int32>();
         int x = 0;
         int value = 0;
@@ -47,7 +47,7 @@ namespace Mech423PIDControllerEx5
         Series veldata = new Series();
         Series pwmdata = new Series();
         //Variable File Builder
-        string path = @"C:\Users\Thomas\MECH423Lab3\MECH-423-Lab3-\Ex5\VS\values.csv";
+        string path = @"C:\Users\Thomas\MECH423Lab3\MECH-423-Lab3-\Ex5\VS\pidvalues.csv";
         string delim = ",";
         StringBuilder csvout = new StringBuilder();
         public Form1()
@@ -83,12 +83,10 @@ namespace Mech423PIDControllerEx5
             timer1.Interval = 1000;
             timer1.Tick += new EventHandler(timer1_Tick);
             timer1.Enabled = true;
-            timer2.Interval = 1000;
-            timer2.Tick += new EventHandler(timer2_Tick);
-            timer2.Enabled = true;
             //Serial Port Init
-            serialPort1.PortName = "COM5";
+            serialPort1.PortName = "COM7";
             serialPort1.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);
+            serialPort1.Open();
 
         }
         private void ConBut_MouseClick(object sender, MouseEventArgs e)
@@ -113,14 +111,13 @@ namespace Mech423PIDControllerEx5
             double velocityRPM = (velocityCPS * 60.0 / (20.4 * 12.0));
             position = position + ((velocityRPM * 8 * 3.14) / 60) * timeDiff;
             //Store values into CSV
-            csvout.AppendLine(x.ToString() + delim + position.ToString());
+            csvout.AppendLine(x.ToString() + delim + position.ToString());//Edit if Needed
             File.WriteAllText(path, csvout.ToString());
             File.AppendAllText(path, csvout.ToString());
             // only plot 100 datapoints
             if (posdata.Points.Count() > 1000) posdata.Points.RemoveAt(0);
             if (veldata.Points.Count() > 1000) veldata.Points.RemoveAt(0);
             if (pwmdata.Points.Count() > 1000) pwmdata.Points.RemoveAt(0);
-
             // actual plotting
             posBox.Text = position.ToString();
             velBox.Text = velocityRPM.ToString();
@@ -175,13 +172,11 @@ namespace Mech423PIDControllerEx5
                 }
             }
         }
-        private void PreparePackets(int direction, int pwm)
+        private void PreparePackets(int pos, int pwm)
         {
-            if (direction == 0 || direction == 1 || direction == 2)
-            {
-                PrepareDirPacket(direction);
-                PreparePWMPacket(pwm);
-                if (DirectionByte.Count == 5 && PWMByte.Count == 5)
+            PreparePosPacket(pos);
+            PreparePWMPacket(pwm);
+                if (PositionByte.Count == 5 && PWMByte.Count == 5)
                 {
                     SendPackets();
                 }
@@ -189,30 +184,40 @@ namespace Mech423PIDControllerEx5
                 {
                     DestroyPackets();
                 }
+        }
+        private void PreparePosPacket(int position)
+        {
+            //Enqueue first byte
+            PositionByte.Enqueue(255);
+            //Enqueue direction byte
+            PositionByte.Enqueue(4);
+            //Fill rest with Zeros
+            if (position > 163)
+            {
+                position = 163;
+            }
+            else if (position < 0)
+            {
+                position = 0;
             }
             else
             {
-                MessageBox.Show("Invalid Direction, No Action Taken", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                position = (int)((1 - (double)position/ 100) * 65535);
             }
-        }
-        private void PrepareDirPacket(int direction)
-        {
-            //Enqueue first byte
-            DirectionByte.Enqueue(255);
-            //Enqueue direction byte
-            DirectionByte.Enqueue(direction);
-            //Fill rest with Zeros
-            for (int i = 0; i < 3; i++)
-            {
-                DirectionByte.Enqueue(0);
-            }
+            ushort pwmnum16 = Convert.ToUInt16(position);
+            byte upperpwm = (byte)(pwmnum16 >> 8);
+            byte lowerpwm = (byte)(pwmnum16 & 0xff);
+            byte esc = 0;
+            PositionByte.Enqueue(upperpwm);
+            PositionByte.Enqueue(lowerpwm);
+            PositionByte.Enqueue(esc);
         }
         private void DestroyPackets()
         {
             int garbage;
-            while (DirectionByte.Count > 0)
+            while (PositionByte.Count > 0)
             {
-                DirectionByte.TryDequeue(out garbage);
+                PositionByte.TryDequeue(out garbage);
             }
             while (PWMByte.Count > 0)
             {
@@ -261,8 +266,8 @@ namespace Mech423PIDControllerEx5
 
             //Enqueue First Byte
             PWMByte.Enqueue(255);
-            //Enqeue 0 for direction, so the direction is not chagned
-            PWMByte.Enqueue(0);
+            //Enqeue 3 for pwm, so the direction is not chagned
+            PWMByte.Enqueue(3);
             //Enqueue the Upper Byte first
             PWMByte.Enqueue(upperpwm);
             //Enqueue the lower byte
@@ -272,25 +277,30 @@ namespace Mech423PIDControllerEx5
         }
         private void SendPackets()
         {
-            byte[] Dir_Byte = { 0, 0, 0, 0, 0 };
+            byte[] Pos_Byte = { 0, 0, 0, 0, 0 };
             byte[] PWM_Byte = { 0, 0, 0, 0, 0 };
             int value;
             for (int i = 0; i < 5; i++)
             {
-                DirectionByte.TryDequeue(out value);
-                Dir_Byte[i] = (byte)value;
+                PositionByte.TryDequeue(out value);
+                Pos_Byte[i] = (byte)value;
                 PWMByte.TryDequeue(out value);
                 PWM_Byte[i] = (byte)value;
             }
-            serialPort1.Write(Dir_Byte, 0, 5);
+            serialPort1.Write(Pos_Byte, 0, 5);
             serialPort1.Write(PWM_Byte, 0, 5);
 
         }
-        private void timer2_Tick(object sender, EventArgs e)
+        private void sendCtrlbut_MouseClick(object sender, MouseEventArgs e)
         {
-        
+            if (targetPositionbox.TextLength == 0 || targetPWMbox.TextLength == 0)
+            {
+                MessageBox.Show("Incomplete Data", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            else
+            {
+                PreparePackets(Convert.ToInt32(targetPositionbox.Text), Convert.ToInt32(targetPWMbox.Text));
+            }
         }
-
-
     }
 }
