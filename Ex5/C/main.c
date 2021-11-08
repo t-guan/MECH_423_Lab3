@@ -41,11 +41,11 @@ unsigned int max;
 unsigned int ref;
 unsigned int fb;
 unsigned int on;
-unsigned int CurrPWM=10;
+int CurrPWM=10;
 unsigned int ConvertedPWM;
-unsigned int targetPWM=50;
+int targetPWM=50;
 double targetpos=10;
-double currpos;
+double currpos=0;
 
 double duty;
 double newTimerVal;
@@ -79,10 +79,10 @@ int main(void)
         }*/
         error=targetpos-currpos;
         if(error<0.0){
-            CurrPWM=-(error*Kp);
+            CurrPWM=(int)(-error*Kp);
         }
         else{
-            CurrPWM=(error*Kp);
+            CurrPWM=(int)(error*Kp);
         }
         if(CurrPWM>targetPWM){
             CurrPWM=targetPWM;
@@ -91,7 +91,7 @@ int main(void)
             CurrPWM=targetPWM;
         }*/
         ConvertedPWM = (unsigned int)((double) CurrPWM/100*65535);
-        processPWM((int)CurrPWM);
+        processPWM(ConvertedPWM);
         //Error Compensation, moving in the CW direction is positive position, CCW in the negative direction
         //Therefore, positive error needs to be compensated by moving in the opposite direction and vice versa
         //Change this if it is required.
@@ -279,7 +279,7 @@ void processPWM(unsigned int data)
 
     if (data == 0)
     {
-        TB2CTL |= MC_0;
+        TB2CTL &= ~(MC_1);
     }
     else
     {
