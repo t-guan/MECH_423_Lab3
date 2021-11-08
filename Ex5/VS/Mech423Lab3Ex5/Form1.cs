@@ -282,7 +282,7 @@ namespace Mech423Lab3Ex5
             }
             else
             {
-                pwm = (int)((1 - (double)pwm / 100) * 65535);
+                pwm = (int)((double)pwm / 100 * 65535);
             }
             ushort pwmnum16 = Convert.ToUInt16(pwm);
             byte upperpwm = (byte)(pwmnum16 >> 8);

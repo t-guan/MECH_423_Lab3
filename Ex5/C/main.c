@@ -272,7 +272,7 @@ void processPWM(unsigned int data)
     maxTimerVal = TB2CCR0;
 
     duty = (double)data / (double)max;
-    newTimerVal = (double)maxTimerVal * duty;
+    newTimerVal = (double)maxTimerVal * (1-duty);
 
     // change timer value to duty cycle
     TB2CCR1 = (unsigned int)newTimerVal;
