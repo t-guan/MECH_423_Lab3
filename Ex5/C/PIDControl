@@ -1,0 +1,13 @@
+#define PID_Control(Ref,Fb,Kp){
+	Err=Ref-Fb;
+	Up=Kp*Err;
+	if(Up>230)
+	{
+	Up=230;
+	}
+	if(Up<1)
+	{
+	Up=0;
+	}
+	}
+	

@@ -130,7 +130,7 @@ namespace Mech423Lab3Ex5
             double velocityRPM = (velocityCPS * 60.0 / (20.4 * 12.0));
             position = position + ((velocityRPM * 8 * 3.14) / 60) * timeDiff;
             //Store values into CSV
-            csvout.AppendLine(x.ToString() + delim + velocityRPM.ToString());
+            csvout.AppendLine(x.ToString() + delim + position.ToString());
             File.WriteAllText(path, csvout.ToString());
             File.AppendAllText(path, csvout.ToString());
             // only plot 100 datapoints
