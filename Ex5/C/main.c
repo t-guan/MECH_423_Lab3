@@ -41,8 +41,9 @@ unsigned int max;
 unsigned int ref;
 unsigned int fb;
 unsigned int on;
-unsigned int CurrPWM=7000;
-unsigned int targetPWM=6553;
+unsigned int CurrPWM=10;
+unsigned int ConvertedPWM;
+unsigned int targetPWM=50;
 double targetpos=10;
 double currpos;
 
@@ -89,6 +90,7 @@ int main(void)
  /*       else if(CurrPWM<targetPWM){
             CurrPWM=targetPWM;
         }*/
+        ConvertedPWM = (unsigned int)((double) CurrPWM/100*65535);
         processPWM((int)CurrPWM);
         //Error Compensation, moving in the CW direction is positive position, CCW in the negative direction
         //Therefore, positive error needs to be compensated by moving in the opposite direction and vice versa
