@@ -25,21 +25,11 @@ namespace Mech423PIDControllerEx5
         ConcurrentQueue<Int32> PositionByte = new ConcurrentQueue<Int32>();
         ConcurrentQueue<Int32> PWMByte = new ConcurrentQueue<Int32>();
         int x = 0;
-        int value = 0;
-        int counter = 0;
-        int usum = 0;
-        int dsum = 0;
-        int avg = 45;
-        int halfticks;
         int bytesToRead = 0;
         int is255 = 0;
-        int freq = 1000;
         double position = 0.0;
-        double circ = 0.523;
-        private static int dirval;
         private static int pwmval;
         private static int sliderticks = 8;
-        private int prevsliderpos = 999;
 
         //The divisor for velocity
         double timeDiff = 0.6;
@@ -86,8 +76,6 @@ namespace Mech423PIDControllerEx5
             //Serial Port Init
             serialPort1.PortName = "COM7";
             serialPort1.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);
-            serialPort1.Open();
-
         }
         private void ConBut_MouseClick(object sender, MouseEventArgs e)
         {
@@ -111,9 +99,7 @@ namespace Mech423PIDControllerEx5
             double velocityRPM = (velocityCPS * 60.0 / (20.4 * 12.0));
             position = position + ((velocityRPM * 8 * 3.14) / 60) * timeDiff;
             //Store values into CSV
-            csvout.AppendLine(x.ToString() + delim + position.ToString());//Edit if Needed
-            File.WriteAllText(path, csvout.ToString());
-            File.AppendAllText(path, csvout.ToString());
+            File.AppendAllText(path, x.ToString() + delim + position.ToString() + '\n');
             // only plot 100 datapoints
             if (posdata.Points.Count() > 1000) posdata.Points.RemoveAt(0);
             if (veldata.Points.Count() > 1000) veldata.Points.RemoveAt(0);
@@ -166,9 +152,9 @@ namespace Mech423PIDControllerEx5
                             dsum = valfromq;
                             is255 = 0;
                             counter++; // increments here, so 1 counter increment == 1 full packet
+                            SumConverter(usum, dsum);
                             break;
                     }
-                    SumConverter(usum, dsum);
                 }
             }
         }
@@ -200,10 +186,7 @@ namespace Mech423PIDControllerEx5
             {
                 position = 0;
             }
-            else
-            {
-                position = (int)((1 - (double)position/ 100) * 65535);
-            }
+
             ushort pwmnum16 = Convert.ToUInt16(position);
             byte upperpwm = (byte)(pwmnum16 >> 8);
             byte lowerpwm = (byte)(pwmnum16 & 0xff);
@@ -228,16 +211,13 @@ namespace Mech423PIDControllerEx5
         {
             if (pwm > 100)
             {
-                pwm = 65535;
+                pwm = 100;
             }
             else if (pwm < 0)
             {
                 pwm = 0;
             }
-            else
-            {
-                pwm = (int)((1 - (double)pwm / 100) * 65535);
-            }
+
             ushort pwmnum16 = Convert.ToUInt16(pwm);
             byte upperpwm = (byte)(pwmnum16 >> 8);
             byte lowerpwm = (byte)(pwmnum16 & 0xff);
