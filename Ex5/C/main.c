@@ -13,6 +13,7 @@ unsigned char dequeueBuffer(void);
 void enqueueBuffer(unsigned char val);
 unsigned int combineBytes(unsigned char lower, unsigned char upper);
 void processPWM(unsigned int data);
+void sendUpDownCountUART(void);
 
 // other functions
 void delayNOP(unsigned int cycles);
@@ -70,13 +71,6 @@ int main(void)
         TA1R=0;
         TA0R=0;
         currpos=currpos+((double)upcount-(double)downcount)*2*8*3.1416/(20.4*12);
-        //Just for protection purposes
-/*        if(currpos>150)
-        {
-            currpos=150;
-            P3OUT |= BIT7;
-            P3OUT &= ~(BIT6);
-        }*/
         error=targetpos-currpos;
         if(error<0.0){
             CurrPWM=(int)(-error*Kp);
@@ -87,9 +81,7 @@ int main(void)
         if(CurrPWM>targetPWM){
             CurrPWM=targetPWM;
         }
- /*       else if(CurrPWM<targetPWM){
-            CurrPWM=targetPWM;
-        }*/
+
         ConvertedPWM = (unsigned int)((double) CurrPWM/100*65535);
         processPWM(ConvertedPWM);
         //Error Compensation, moving in the CW direction is positive position, CCW in the negative direction
@@ -179,8 +171,8 @@ void configureMiscPins(void)
 void enableInterrupts(void)
 {
     UCA1IE |= UCRXIE; // enable Receive and Transfer Interrupt, User Guide page 502
-/*    TB2CTL |= TBIE;
-    TB2CCTL0 |= CCIE;*/
+    TB2CTL |= TBIE;
+    TB2CCTL0 |= CCIE;
     _EINT(); // global interrupt enable
 }
 
@@ -232,30 +224,13 @@ void processPacket(void)
 
     fullData = combineBytes(LowerDataByte, UpperDataByte);
 
-
-    /*if (CmdByte == 0)
-    {
-        processPWM(fullData); // changes PWM
-    }
-    if (CmdByte == 1)
-    {
-        // change dir to ccw
-        P3OUT |= BIT7;
-        P3OUT &= ~(BIT6);
-    }
-    if (CmdByte == 2)
-    {
-        // change dir to cw
-        P3OUT |= BIT6;
-        P3OUT &= ~(BIT7);
-    }*/
     //Set target PWM
-    if (CmdByte ==3 )
+    if (CmdByte == 3)
     {
         targetPWM=fullData;
     }
     //Set target Position
-    if(CmdByte ==4)
+    if (CmdByte == 4)
     {
         targetpos=fullData;
     }
@@ -317,6 +292,20 @@ int preservePacketFormat(unsigned char Rx)
     return 1;
 }
 
+void sendUpDownCountUART(void)
+{
+    while ((UCA1IFG & UCTXIFG) == 0);
+    UCA1TXBUF=255;
+
+    while ((UCA1IFG & UCTXIFG) == 0);
+    UCA1TXBUF=TA1R;
+
+    while ((UCA1IFG & UCTXIFG) == 0);
+    UCA1TXBUF=TA0R;
+
+    while ((UCA1IFG & UCTXIFG) == 0);
+}
+
 #pragma vector = USCI_A1_VECTOR
 __interrupt void USCI_A1_ISR(void)
 {
@@ -358,22 +347,14 @@ __interrupt void USCI_A1_ISR(void)
     }
 }
 
-/*#pragma vector = TIMER2_B0_VECTOR
+#pragma vector = TIMER2_B0_VECTOR
 __interrupt void TimerBISR(void)
 {
-    while ((UCA1IFG & UCTXIFG) == 0);
-    UCA1TXBUF=255;
-    while ((UCA1IFG & UCTXIFG) == 0);
-    UCA1TXBUF=TA1R;
-    TA1R=0;
-    while ((UCA1IFG & UCTXIFG) == 0);
-    UCA1TXBUF=TA0R;
-    TA0R=0;
-    while ((UCA1IFG & UCTXIFG) == 0);
+    sendUpDownCountUART();
 
     TB2IV = 0;
     TB2CTL &= ~TBIFG;
-}*/
+}
 
 // CONNECTIONS
 // -----------
